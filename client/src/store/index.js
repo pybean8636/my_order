@@ -9,13 +9,15 @@ export default new Vuex.Store({
       {id:'pybean', pw:112233, name:'박유빈'}
     ],
     isLogin: false,
-    isLoginError:false
+    isLoginError:false,
+    userInfo:null
   },
   mutations: {
     //login success
-    loginSucceess(state){
+    loginSucceess(state, payload){
       state.isLogin = true
       state.isLoginError= false
+      state.userInfo =payload
     },
     //login fail
     loginError(state){
@@ -25,8 +27,14 @@ export default new Vuex.Store({
   },//change state
   actions: {
     //tryng login  success->loginSuccess commit, fail->loginError commit
-    login({state, commit}, signinOb){
-      commit('')
+    login({state, commit}, loginOb){
+        let selectedUser=null
+        state.allUsers.forEach(user => {
+            if(user.id === loginOb. id) selectedUser=user    
+        });
+        selectedUser===null ? commit('loginError') :
+            selectedUser.pw != loginOb.pw ? commit('loginError') : commit('loginSucceess',selectedUser)
+    
     }
 
   },//

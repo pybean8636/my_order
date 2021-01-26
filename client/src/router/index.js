@@ -6,15 +6,27 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "home",
     component: () =>
-    import(/* webpackChunkName: "home" */ "../views/Home.vue")
+    import(/* webpackChunkName: "home" */ "../views/Home.vue")//webpackChunkName 지정하면 해당 이름으로 파일이 분리되어 빌드
   },
   {
     path: "/login",
-    name: "Login",
+    name: "login",
     component: () =>
     import(/* webpackChunkName: "login" */ "../views/Login.vue")
+  },
+  {
+    path: "/my_page",
+    name: "my_page",
+    component: () =>
+    import(/* webpackChunkName: "my_page" */ "../views/MyPage.vue")
+  },
+  {
+    path: "/order",
+    name: "order",
+    component: () =>
+    import(/* webpackChunkName: "order" */ "../views/Order.vue")
   },
 ];
 
