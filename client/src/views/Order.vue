@@ -44,6 +44,12 @@
 
 export default {
   name: "order",
+  data(){
+      return{
+
+            tag:false,
+      }
+  },
   components: {
   }
 };

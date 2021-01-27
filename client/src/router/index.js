@@ -5,7 +5,7 @@ import store from "../store/index.js"
 Vue.use(VueRouter);
 
 const onlyUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
-  if(store.state.isToken===false){
+  if(store.state.isLogin===false && store.state.isToken===false){
     alert("로그인을 해주세요")
     next("/login")
   }else{

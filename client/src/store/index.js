@@ -83,7 +83,8 @@ export default new Vuex.Store({
           commit("loginSucceess", userInfo)
         })
         .catch((error)=>{
-          alert(error)
+          console.log(error)
+          alert("로그인 실패")
         })
 
     }
