@@ -76,7 +76,9 @@ export default new Vuex.Store({
           let userInfo = {
             id:response.data.user_id,
             name:response.data.user_name,
-            contact:response.data.user_contact
+            contact:response.data.user_contact,
+            store_id:response.data.store_id,
+            store_location:response.data.store_location
           }
           commit("loginSucceess", userInfo)
         })

@@ -34,7 +34,7 @@
     >
 
       <v-toolbar-title>
-        Order List
+        Latest Order
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
