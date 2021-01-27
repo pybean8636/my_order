@@ -56,9 +56,14 @@
       <router-view></router-view>
     </v-content>
 
-    <v-footer app>
-      <!-- -->
-    </v-footer>
+      <v-footer padless>
+    <v-col
+      class="text-center"
+      cols="12"
+    >
+      {{ new Date().getFullYear() }} — <strong>Vue.js Order Site</strong>
+    </v-col>
+  </v-footer>
 </v-app>
 </template>
 

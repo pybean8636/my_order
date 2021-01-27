@@ -42,6 +42,13 @@ const routes = [
     component: () =>
     import(/* webpackChunkName: "order" */ "../views/Order.vue")
   },
+  {
+    path: "/check",
+    name: "check",
+    beforeEnter: onlyUser,
+    component: () =>
+    import(/* webpackChunkName: "check" */ "../views/Check.vue")
+  },
 ];
 
 const router = new VueRouter({
