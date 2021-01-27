@@ -4,7 +4,7 @@
            <v-flex xs12>
                <v-alert 
                type="error"
-               :value="isError"
+               :value="isLoginError"
                class="mb-1"
                >
                 login fail
@@ -33,20 +33,19 @@
                         type="password"
                         placeholder="PW를 입력해주세요"
                         outlined
-                        @keyup.enter="login()"
+                        @keyup.enter="login({id:id,pw:pw})"
                         >
                         </v-text-field>
                     </div>
                     <div class="text-center pa-3"> 
                         <v-hover
                             open-delay="400"
-                            color="grey"
                         >
                             <v-btn 
-                            rounded
                             dark
                             block
-                            @click="login()"
+                            @click="login({id:id,pw:pw})"
+                            class="grey darken-4"
                             >
                                 로그인  
                             </v-btn>
@@ -60,23 +59,21 @@
 
 
 <script>
+import {mapState, mapActions} from "vuex"
+// import axios from 'axios';
+
 export default {
     data(){
         return {
             id:null,
             pw:null,
-            isError:false
         }
     },
+    computed:{
+        ...mapState(['isLogin', 'isLoginError'])
+    },
     methods:{
-        login(){
-            let selectedUser=null
-            this.allUsers.forEach(user => {
-                if(user.id === this. id) selectedUser=user    
-            });
-            selectedUser===null ? this.isError = true :
-                selectedUser.pw != this.pw ? this.isError = true : console.log('login success')
-        }
+        ...mapActions(['login']),
     }
 }
 </script>
