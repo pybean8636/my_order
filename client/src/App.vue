@@ -40,7 +40,7 @@
           <v-btn block class="grey darken-4" v-if="isLogin===false" router :to="{name: 'login'}">
             Login
           </v-btn>
-          <v-btn block class="grey darken-4" v-else router :to="{name: 'login'}">
+          <v-btn block class="grey darken-4" v-else @click="$store.dispatch('logout')">
             Logout
           </v-btn>
         </div>

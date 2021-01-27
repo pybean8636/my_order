@@ -44,7 +44,7 @@
                             <v-btn 
                             dark
                             block
-                            @click="login()"
+                            @click="login({id:id,pw:pw})"
                             class="grey darken-4"
                             >
                                 로그인  
@@ -60,6 +60,8 @@
 
 <script>
 import {mapState, mapActions} from "vuex"
+// import axios from 'axios';
+
 export default {
     data(){
         return {
