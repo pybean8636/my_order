@@ -4,6 +4,7 @@ node_modules
 
 bin
 lib
+package
 
 # local env files
 .env.local
@@ -24,5 +25,7 @@ pnpm-debug.log*
 *.sln
 *.sw?
 *cfg
+*.config.js
+
 
 **/__pycache__
