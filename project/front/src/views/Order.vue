@@ -21,12 +21,15 @@
             <v-slide-group
             multiple
             show-arrows
+            v-model="model"
             >
                 <v-slide-item
                     v-for="tag in tags"
-                    :key="tag"
+                    :key="tag.id"
+                    :value="tag.name"
                     v-slot="{ active, toggle }"
                 >
+                <!-- 모델에 선택된 태그들로 필터링하기 위해서 태그 이름을 값으로 배열에 저장 -->
                     <v-btn
                     class="mx-2"
                     :input-value="active"
@@ -36,7 +39,7 @@
                     @click="toggle"
                     >
                     <!-- 태그 받아와야 함~! -->
-                    {{ tag }}
+                    {{ tag.name }}
                     </v-btn>
                 </v-slide-item>
             </v-slide-group>
@@ -44,10 +47,10 @@
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
-        <p>{{ tags }}</p>
+        <p>{{ filterByTag }}</p>
     <div class="d-flex flex-column mb-6">
         <v-card
-            v-for="item in items"
+            v-for="item in filterByTag"
             :key="item.id"
             class="pa-3 ma-1"
             outlined
@@ -135,8 +138,22 @@ import {mapState} from "vuex"
 export default {
      data(){
         return {
+            model:null,
             tag:false,
-            tags:['test', 'test1'],
+            tags:[
+                {
+                    id:0, 
+                    name:'test',
+                },
+                {
+                    id:1, 
+                    name:'test1',
+                },
+                {
+                    id:2, 
+                    name:'test2',
+                }      
+            ],
             selected: [],
             items:[
                 {
@@ -175,7 +192,7 @@ export default {
                     price: 30000,
                     unit: '박스',
                     info: '...',
-                    tag:'test',
+                    tag:'test1',
                     qty:null
                 },
                 {
@@ -198,7 +215,7 @@ export default {
                     check:false,
                     qty:null
                 },
-            ]
+            ],
             
         }
     },
@@ -209,25 +226,29 @@ export default {
             var items=this.items
             var sum=0
             items.forEach(item => {
-                console.log(item.id,item.qty)
+                // console.log(item.id,item.qty)
                 sum+=(item.price*item.qty)
              });
-             console.log(sum)
+            //  console.log(sum)
             return sum          
         },
-        addTag(n){
-            console.log(n)
-            var arry=this.selectedTag
-            arry.push(n)
-            return 0
-        },
+        // addTag(){
+        // },
         t(){
             console.log('ttttt')
             return 0
+        },
+        filterByTag(){
+            return this.items.filter((item)=>{
+                // console.log(item.id,this.model,'------')
+                if(this.model != null){
+                    return this.model.includes(item.tag)
+                }
+                else{
+                    return item
+                }
+            })
         }
-        // filterByTag(){
-        //     return 0
-        // }
         
     }
 };
