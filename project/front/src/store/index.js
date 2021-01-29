@@ -14,15 +14,20 @@ export default new Vuex.Store({
   },
   mutations: {
     //login success
-    loginSucceess(state, payload){
-      if(state.isToken===true){//login 하고 홈으로 이동...... 을 할라고 한 건데 왜 트루일까
-        router.push({name:'home'})
-      }
-      state.isLogin = true
-      state.isLoginError= false
-      state.userInfo =payload
-      state.isToken = true
+    async loginSucceess(state, payload){
+      if(state.isToken===false){
+        state.isLogin = true
+        state.isLoginError= false
+        state.userInfo =payload
+        state.isToken = true
 
+        await router.push({name:'home'})//js 비동기 잊지 말고 순서 중요한거 async걸기
+      }else{
+        state.isLogin = true
+        state.isLoginError= false
+        state.userInfo =payload
+        state.isToken = true  
+      }
       // 
     },
     //login fail

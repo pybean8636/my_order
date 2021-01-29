@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="ma-2">
   <!-- 매장정보 -->
   <v-card
     max-width="900"

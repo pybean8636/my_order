@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="header">
     
     <v-navigation-drawer
       class="teal darken-1"
@@ -56,7 +56,22 @@
       <router-view></router-view>
     </v-content>
 
-      <v-footer padless>
+    <v-fab-transition>
+    <v-btn
+      bottom
+      right
+      fixed
+      fab
+      dark
+      small
+      @click="$vuetify.goTo('#header')"
+    >
+      <v-icon>mdi-arrow-up-bold</v-icon>
+    </v-btn>
+</v-fab-transition>
+
+
+      <v-footer >
     <v-col
       class="text-center"
       cols="12"

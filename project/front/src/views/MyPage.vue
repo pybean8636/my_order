@@ -3,6 +3,7 @@
         <h2>{{ userInfo.store_location }}점 발주 내역</h2>
         <!-- 나중에 매장아이디로 바꿔서 같은 매장 주문내역 공유 -->
         
+        <v-divider class="my-5"></v-divider>
         <v-card
             elevation="2"
             max-width="100%"

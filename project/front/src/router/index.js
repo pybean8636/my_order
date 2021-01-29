@@ -1,3 +1,5 @@
+// import { false } from "tap";
+// import { false } from "tap";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "../store/index.js"
@@ -12,7 +14,15 @@ const onlyUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이�
     next()
   }
 }
-
+const regectAuthUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
+  if(store.state.isToken===true){
+    alert("이미 로그인 되었습니다")
+    next("/")
+  }else{
+    next()
+    console.log('tlqkf')
+  }
+}
 
 const routes = [
   {
@@ -25,6 +35,7 @@ const routes = [
   {
     path: "/login",
     name: "login",
+    beforeEnter: regectAuthUser,
     component: () =>
     import(/* webpackChunkName: "login" */ "../views/Login.vue")
   },
