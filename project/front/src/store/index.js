@@ -10,12 +10,13 @@ export default new Vuex.Store({
     isLogin: false,
     isLoginError:false,
     userInfo:null,
-    isToken:null
+    isToken:null,
+    storeInfo:null
   },
   mutations: {
     //login success
     async loginSucceess(state, payload){
-      if(state.isToken===false){
+      if(state.isToken !=true){
         state.isLogin = true
         state.isLoginError= false
         state.userInfo =payload
@@ -39,9 +40,15 @@ export default new Vuex.Store({
     quitAuth(state){
       state.isLogin=false
       state.isLoginError= false
-      state.userInfo=null
       state.isToken = false
+      state.userInfo=null
+      state.storeInfo=null
       localStorage.removeItem("access_token")
+    },
+    getStoreSucceess(state, payload){
+
+      state.storeInfo=payload
+
     }
   },//change state
   actions: {
@@ -90,6 +97,33 @@ export default new Vuex.Store({
         .catch((error)=>{
           console.log(error)
           alert("로그인 실패")
+        })
+
+    },
+    getStoreInfo({commit}){
+
+      let token =localStorage.getItem("access_token")
+      let config = {
+        headers:{
+          "Authorization":token
+        }
+      }
+      console.log(config)
+      const path = 'http://localhost:5000/api/store_info';
+      axios
+        .get(path, config)
+        .then(response =>{
+          let storeInfo = {
+            location:response.data.store_location,
+            contact:response.data.store_contact,
+            headquarters:response.data.headquarters_name 
+          }
+          console.log(storeInfo)
+          commit("getStoreSucceess", storeInfo)
+        })
+        .catch((error)=>{
+          console.log(error)
+          alert("매장정보 가져오기 실패")
         })
 
     }

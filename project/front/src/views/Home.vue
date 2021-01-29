@@ -7,13 +7,13 @@
     class="ma-8"
   >
     <v-card-text>
-      <div>Headquarters</div>
+      <h3>{{storeInfo.headquarters}}</h3>
       <p class="display-1 text--primary">
-        store_location
+        {{storeInfo.location}}점
       </p>
       <div class="text--primary">
       <v-icon class="mr-3">{{ 'mdi-phone' }}</v-icon>
-        02-333-4444
+        {{storeInfo.contact}}
       </div>
     </v-card-text>
 
@@ -93,11 +93,18 @@
 </template>
 
 <script>
+import {mapState , mapActions} from "vuex"  //
 // @ is an alias to /src
 
 export default {
   name: "home",
   components: {
+  },
+  computed:{
+      ...mapState(['storeInfo'])
+  },
+  methods:{
+      ...mapActions(['getStoreInfo']),
   }
 };
 </script>

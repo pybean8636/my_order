@@ -30,7 +30,8 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title @click="$router.push({name: item.name})" >{{ item.title }}</v-list-item-title>
+            <v-list-item-title @click="$router.push({name: item.name}).catch(err => {})" >{{ item.title }}</v-list-item-title>
+            <!-- 똑같은 주소로 이동하는 거에 에러뜨는 거 신경 안 쓸라면 .catch(err => {}) 추가 -->
           </v-list-item-content>
         </v-list-item>
       </v-list>

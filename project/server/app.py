@@ -46,7 +46,7 @@ def login_auth():
 
     return jsonify(response_object)
 
-@app.route('/api/user_info', methods=['GET'])
+@app.route('/api/user_info', methods=['GET'])#사용자 정보 반환해주는 서버 
 def get_userInfo():
     response_object = {'status':'success'}
     access_token = request.headers.get('Authorization')
@@ -79,6 +79,42 @@ def get_userInfo():
         response_object['message'] = 'token error'
     
     #print('*'*20,response_object)
+
+    return jsonify(response_object)
+
+
+@app.route('/api/store_info', methods=['GET'])#매장 정보 반환해주는 서버 
+def get_storeInfo():
+    response_object = {'status':'success'}
+    access_token = request.headers.get('Authorization')
+    print(access_token)
+
+    if access_token is not None:
+        try:
+            payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
+        except jwt.InvalidTokenError:
+            response_object['status']="401 Error"
+            return Response(status=401)
+        
+       #디비 검색 결과 -> 해당 매장 위치, 매장 번호, 본사
+        store_id=payload['store_id']
+        print(store_id)
+        sql="""
+            SELECT store.store_location, store.store_contact, headquarters.headquarters_name
+            FROM store, headquarters 
+            WHERE store.store_id=%s and headquarters.headquarters_id=store.headquarters_id;
+            """
+        cursor.execute(sql, store_id)
+        user_info = cursor.fetchone()
+
+        response_object['store_location']=user_info[0]
+        response_object['store_contact']=user_info[1]
+        response_object['headquarters_name']=user_info[2]
+    else:
+        response_object['status']="401 Error"
+        response_object['message'] = 'token error'
+    
+    print('*'*20,response_object)
 
     return jsonify(response_object)
 

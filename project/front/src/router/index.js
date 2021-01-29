@@ -1,20 +1,23 @@
-// import { false } from "tap";
-// import { false } from "tap";
+
 import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "../store/index.js"
 
 Vue.use(VueRouter);
 
-const onlyUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
-  if(store.state.isLogin===false && store.state.isToken===false){
-    alert("로그인을 해주세요")
-    next("/login")
-  }else{
-    next()
-  }
-}
+// const onlyUser =async (to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
+//   if(store.state.isLogin===false && store.state.isToken===false){
+//     alert("로그인을 해주세요")
+//     next("/login")
+//   }else{
+//     if (to.name==='home'){
+//       await store.dispatch("getStoreInfo")
+//     }
+//     await next()
+//   }
+// }
 const regectAuthUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
+  console.log(store.state.isToken)
   if(store.state.isToken===true){
     alert("이미 로그인 되었습니다")
     next("/")
@@ -24,11 +27,38 @@ const regectAuthUser =(to, from, next) =>{//로그인 안된 유저의 다른 �
   }
 }
 
+const routerGuard=async (to, from, next) =>{
+
+  if(store.state.isLogin===false && store.state.isToken===false){
+    alert("로그인을 해주세요")
+    next("/login")
+  }
+  else if(to.name==='home' && store.state.isToken===true){
+    await store.dispatch("getStoreInfo")
+
+    console.log(store.state.storeInfo)
+    await next()
+  }
+  else{
+    next()
+  }
+
+
+}
+
+
+// else if(to.name==='login' && store.state.isToken===true){
+//   alert("이미 로그인 되었습니다")
+//   next("/")
+// }
+
+
+
 const routes = [
   {
     path: "/",
     name: "home",
-    beforeEnter: onlyUser,//클릭하면 이거 먼저 실행해서 체크
+    beforeEnter: routerGuard,//클릭하면 이거 먼저 실행해서 체크
     component: () =>
     import(/* webpackChunkName: "home" */ "../views/Home.vue")//webpackChunkName 지정하면 해당 이름으로 파일이 분리되어 빌드
   },
@@ -42,21 +72,21 @@ const routes = [
   {
     path: "/my_page",
     name: "my_page",
-    beforeEnter: onlyUser,
+    beforeEnter: routerGuard,
     component: () =>
     import(/* webpackChunkName: "my_page" */ "../views/MyPage.vue")
   },
   {
     path: "/order",
     name: "order",
-    beforeEnter: onlyUser,
+    beforeEnter: routerGuard,
     component: () =>
     import(/* webpackChunkName: "order" */ "../views/Order.vue")
   },
   {
     path: "/check",
     name: "check",
-    beforeEnter: onlyUser,
+    beforeEnter: routerGuard,
     component: () =>
     import(/* webpackChunkName: "check" */ "../views/Check.vue")
   },

@@ -47,7 +47,7 @@
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
-        <p>{{ filterByTag }}</p>
+        <p>{{ model }}</p>
     <div class="d-flex flex-column mb-6">
         <v-card
             v-for="item in filterByTag"
@@ -100,9 +100,6 @@
                     </v-col>
                         
                 </v-row>
-                <!-- <v-row>
-                    <v-col class="mr-5 text-right" align-self="end" ><h3>total parice</h3>{{0}}원</v-col>
-                </v-row> -->
             </v-col>
 
         </v-row>
@@ -117,6 +114,7 @@
             class="white--text "
             large
             rounded
+            @click="$router.push({name: 'check'})"
             >
                 선택 완료
                 <v-icon
@@ -227,7 +225,9 @@ export default {
             var sum=0
             items.forEach(item => {
                 // console.log(item.id,item.qty)
-                sum+=(item.price*item.qty)
+                if(item.check){
+                    sum+=(item.price*item.qty)
+                }
              });
             //  console.log(sum)
             return sum          
@@ -239,16 +239,25 @@ export default {
             return 0
         },
         filterByTag(){
-            return this.items.filter((item)=>{
-                // console.log(item.id,this.model,'------')
-                if(this.model != null){
+            if (this.tag===true && this.model!=null && this.model.length>0){
+                return this.items.filter((item)=>{
                     return this.model.includes(item.tag)
-                }
-                else{
-                    return item
-                }
-            })
-        }
+                })
+            }else{
+                return this.items
+            }
+        },
+        // filterByTag(){
+        //     return this.items.filter((item)=>{
+        //         // console.log(item.id,this.model,'------')
+        //         if(this.model != null){
+        //             return this.model.includes(item.tag)
+        //         }
+        //         else{
+        //             return item
+        //         }
+        //     })
+        // }
         
     }
 };
