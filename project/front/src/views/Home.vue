@@ -24,9 +24,9 @@
     <!-- 해당 사용자의 최근 발주 내역 -->
   <v-card
     elevation="2"
-    height="300px" 
-    width="900px"
+    max-width="100%"
     class="ma-8"
+    max-height="500px"
   >
     <v-toolbar
     :color="'grey darken-4'"
@@ -42,7 +42,7 @@
     </v-toolbar>
 
 
-
+  <v-card class="overflow-y-auto" max-height="400px">
   <v-simple-table width="200px" class="ma-5">
 
     <thead>
@@ -73,11 +73,20 @@
         <td>{{item.price}}</td>
         <td>{{item.total_price}}</td>
       </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><h4 class="ma-2 pa-1">합계</h4></td>
+        <h5 class="ma-3 pa-1">{{total}}</h5>
+      </tr>
+      
     </tbody>
 
   </v-simple-table>
 
-    <v-btn
+  </v-card>
+  <v-btn
       large
       dark
       absolute
@@ -113,7 +122,14 @@ export default {
     }
   },
   computed:{
-      ...mapState(['storeInfo'])
+      ...mapState(['storeInfo']),
+      total(){
+        var sum=0
+        this.order.forEach(item => {
+          sum+=(item.price*item.qty)
+        })
+        return sum
+      }
   },
   methods:{
       ...mapActions(['getStoreInfo']),

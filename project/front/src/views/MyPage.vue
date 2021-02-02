@@ -61,6 +61,13 @@
                     <td>{{item.price}}</td>
                     <td>{{item.total_price}}</td>
                 </tr>
+                 <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><h4 class="ma-2 pa-1">합계</h4></td>
+                    <h5 class="ma-3 pa-1">{{total(index)}}</h5>
+                </tr>
             </tbody>
 
             </v-simple-table>
@@ -146,6 +153,13 @@ export default {
             console.log('index',index)
             store.state.items=this.orders[index].order
             this.$router.push({name: 'check'})
+        },
+        total(index){
+            var sum=0
+            this.orders[index].order.forEach(item => {
+            sum+=(item.price*item.qty)
+            })
+            return sum
         }
     },
     created(){

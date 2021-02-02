@@ -213,7 +213,7 @@ def get_orderInfo():
     response_object['order_info']=[]
     response_object['date']=latest
     for info in order_info:
-
+        
         temp={
             'name':info[0],
             'qty':info[1],
@@ -226,6 +226,8 @@ def get_orderInfo():
             'tag':info[8],
             'check':True
         }
+        if info[8]==None:
+                temp['tag']='기타'
         response_object['order_info'].append(temp)
     
 
@@ -321,8 +323,7 @@ def get_myOrderInfo():
             #temp append
             #order_id change
         
-        
-        temp['order'].append({
+        temp2={
             'name':info[6],
             'qty':info[1],
             'unit':info[8],
@@ -333,7 +334,10 @@ def get_myOrderInfo():
             'info':info[10],
             'tag':info[11],
             'check':True
-        })
+        }
+        if info[11]==None:
+            temp2['tag']='기타'
+        temp['order'].append(temp2)
             
     response_object['order_info'].append(temp)
     print(response_object)
