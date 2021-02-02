@@ -286,5 +286,60 @@ def put_orderInfo():
 
     return jsonify(response_object)
 
+@app.route('/api/my_order_info', methods=['POST'])#발주 저장 
+def get_myOrderInfo():
+    print('----my page------')
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    store_id=post_data.get('store_id')
+    # user_key_id=post_data.get('user_key_id')
+
+
+    sql="""
+        SELECT order_detail.* ,item.*, `order`.`date`
+        FROM `order`, order_detail, item
+        WHERE `order`.order_id=order_detail.order_id and order_detail.item_id= item.item_id and `order`.order_id in
+        (SELECT  `order`.order_id
+        FROM `order`, `user`, store
+        WHERE store.store_id =%s and store.store_id = `user`.store_id and `order`.user_key_id=`user`.user_key_id) 
+        order by `order`.order_id DESC;
+        """
+    cursor.execute(sql,store_id)
+    orderInfo=cursor.fetchall()
+
+    response_object['order_info']=[]
+    order_id=orderInfo[0][3]
+    temp={'order':[],'date':orderInfo[0][13]}
+    print(order_id)
+    for info in orderInfo:
+        print('info',info)
+        if order_id != info[3]:
+            print('append')
+            response_object['order_info'].append(temp)
+            order_id=info[3]
+            temp={'order':[],'date':info[13]}
+            #temp append
+            #order_id change
+        
+        
+        temp['order'].append({
+            'name':info[6],
+            'qty':info[1],
+            'unit':info[8],
+            'price':info[7],
+            'total_price':info[2],
+            'id':info[4],
+            'stock':info[9],
+            'info':info[10],
+            'tag':info[11],
+            'check':True
+        })
+            
+    response_object['order_info'].append(temp)
+    print(response_object)
+
+    return jsonify(response_object)
+
+
 if __name__ == '__main__':
     app.run()

@@ -8,6 +8,8 @@
             elevation="2"
             max-width="100%"
             class="mt-8 pb-2 a-5"
+            v-for="(order, index) in orders"
+            :key="index"
         >
             <v-toolbar
             :color="'grey darken-2'"
@@ -17,7 +19,7 @@
             >
 
                 <v-toolbar-title>
-                    2021-01-19 17:30:00 Order List
+                    {{order.date}} Order List
                 </v-toolbar-title>
 
                 <v-spacer></v-spacer>
@@ -31,71 +33,34 @@
             <v-simple-table width="200px"
             >
 
-            <thead>
-            <tr>
-                <th class="text-left ">
-                    <div class="body-2 font-weight-bold">Name</div>
-                </th>
-                <th class="text-left">
-                Qty
-                </th>
-                <th class="text-left">
-                Unit
-                </th>
-                <th class="text-left">
-                Total Price
-                </th>
-            </tr>
+           <thead>
+                <tr>
+                    <th class="text-left">
+                    Name
+                    </th>
+                    <th class="text-left">
+                    Qty
+                    </th>
+                    <th class="text-left">
+                    Unit
+                    </th>
+                    <th class="text-left">
+                    Price
+                    </th>
+                    <th class="text-left">
+                    Total Price
+                    </th>
+                </tr>
             </thead>
 
             <tbody>
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-
-
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-            <tr>
-                <td>item</td>
-                <td>qty</td>
-                <td>box</td>
-                <td>price</td>
-            </tr>
-
-
-
+                <tr v-for="item in order.order" :key=item.name>
+                    <td>{{item.name}}</td>
+                    <td>{{item.qty}}</td>
+                    <td>{{item.unit}}</td>
+                    <td>{{item.price}}</td>
+                    <td>{{item.total_price}}</td>
+                </tr>
             </tbody>
 
             </v-simple-table>
@@ -107,7 +72,7 @@
             bottom
             right
             class="v-btn--example grey darken-3"
-            @click="$router.push({name: 'check'})"
+            @click="setItems(index)"
             >
                 <v-icon>mdi-cart-arrow-down</v-icon>
             </v-btn>
@@ -147,18 +112,44 @@
 </template>
 
 <script>
+import axios from 'axios';
+import store from "../store/index.js"
 import {mapState} from "vuex"
 
 export default {
      data(){
         return {
-            tag:false,
+            orders:[]
             
         }
     },
     computed:{
         
         ...mapState(["userInfo"])
+    },
+    methods:{
+        getOrders(){
+            const payload ={
+                store_id:store.state.userInfo.store_id
+            }
+            const path = 'http://localhost:5000/api/my_order_info'
+             axios.post(path, payload)
+              .then((res) => {
+                console.log("get my page info")
+                this.orders = res.data.order_info
+              })
+              .catch((error) => {
+              console.error(error);
+              });
+        },
+        setItems(index){//store item
+            console.log('index',index)
+            store.state.items=this.orders[index].order
+            this.$router.push({name: 'check'})
+        }
+    },
+    created(){
+        this.getOrders()
     }
 };
 </script>

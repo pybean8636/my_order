@@ -177,7 +177,7 @@ export default {
         
     },
     methods:{
-        ...mapActions(['getItems']),
+        ...mapActions(['getItems'])
         
     },
     created() {
