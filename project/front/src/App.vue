@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="header">
     
     <v-navigation-drawer
       class="teal darken-1"
@@ -30,7 +30,8 @@
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title @click="$router.push({name: item.name})" >{{ item.title }}</v-list-item-title>
+            <v-list-item-title @click="$router.push({name: item.name}).catch(err => {})" >{{ item.title }}</v-list-item-title>
+            <!-- 똑같은 주소로 이동하는 거에 에러뜨는 거 신경 안 쓸라면 .catch(err => {}) 추가 -->
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -53,10 +54,25 @@
     <v-content>
 
       <!-- If using vue-router -->
-      <router-view></router-view>
+      <router-view :key="$route.fullPath"></router-view>
     </v-content>
 
-      <v-footer padless>
+    <v-fab-transition>
+    <v-btn
+      bottom
+      right
+      fixed
+      fab
+      dark
+      small
+      @click="$vuetify.goTo('#header')"
+    >
+      <v-icon>mdi-arrow-up-bold</v-icon>
+    </v-btn>
+</v-fab-transition>
+
+
+      <v-footer >
     <v-col
       class="text-center"
       cols="12"
