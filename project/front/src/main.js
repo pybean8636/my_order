@@ -10,8 +10,8 @@ new Vue({
   router,
   store,
   vuetify,
-  beforeCreate(){
-    this.$store.dispatch("getUserInfo")
-  },
+  // beforeCreate(){
+  //   this.$store.dispatch("getUserInfo")
+  // },
   render: h => h(App)
 }).$mount("#app");

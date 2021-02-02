@@ -78,7 +78,7 @@
             </v-btn>
         </v-col>        
     </div>
-  {{selectedItems}}
+  <!-- {{selectedItems}} -->
 
   </v-container>
 </template>

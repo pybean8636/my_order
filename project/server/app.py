@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-cursor = db.cursor()
+# db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+# cursor = db.cursor()
 
 @app.route('/', methods=['GET'])
 def test():
@@ -18,6 +18,10 @@ def test():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login_auth():
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
     response_object = {'status':'success'}
     post_data = request.get_json()
     
@@ -49,10 +53,18 @@ def login_auth():
         response_object['message'] = 'ID does not exit'
         #print('does not exit')
 
+    db.close()
+
     return jsonify(response_object)
 
 @app.route('/api/user_info', methods=['GET'])#사용자 정보 반환해주는 서버 
 def get_userInfo():
+
+
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
     response_object = {'status':'success'}
     access_token = request.headers.get('Authorization')
 
@@ -85,49 +97,57 @@ def get_userInfo():
         response_object['status']="401 Error"
         response_object['message'] = 'token error'
     
-    #print('*'*20,response_object)
+    print('*'*20,response_object)
 
+    db.close()
     return jsonify(response_object)
 
 
-@app.route('/api/store_info', methods=['GET'])#매장 정보 반환해주는 서버 
+@app.route('/api/store_info', methods=['POST'])#매장 정보 반환해주는 서버 
 def get_storeInfo():
+
+
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
+
     response_object = {'status':'success'}
-    access_token = request.headers.get('Authorization')
-    print(access_token)
+    post_data = request.get_json()
+    print(post_data)
+    store_id=post_data.get('store_id')
 
-    if access_token is not None:
-        try:
-            payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
-        except jwt.InvalidTokenError:
-            response_object['status']="401 Error"
-            return Response(status=401)
-        
-       #디비 검색 결과 -> 해당 매장 위치, 매장 번호, 본사
-        store_id=payload['store_id']
-        print(store_id)
-        sql="""
-            SELECT store.store_location, store.store_contact, headquarters.headquarters_name
-            FROM store, headquarters 
-            WHERE store.store_id=%s and headquarters.headquarters_id=store.headquarters_id;
-            """
-        cursor.execute(sql, store_id)
-        user_info = cursor.fetchone()
 
-        response_object['store_location']=user_info[0]
-        response_object['store_contact']=user_info[1]
-        response_object['headquarters_name']=user_info[2]
-    else:
-        response_object['status']="401 Error"
-        response_object['message'] = 'token error'
+    
+    #디비 검색 결과 -> 해당 매장 위치, 매장 번호, 본사
+
+    sql="""
+        SELECT store.store_location, store.store_contact, headquarters.headquarters_name
+        FROM store, headquarters 
+        WHERE store.store_id=%s and headquarters.headquarters_id=store.headquarters_id;
+        """
+    cursor.execute(sql, store_id)
+    user_info = cursor.fetchone()
+
+    response_object['store_location']=user_info[0]
+    response_object['store_contact']=user_info[1]
+    response_object['headquarters_name']=user_info[2]
+
     
     print('*'*20,response_object)
-
+    db.close()
     return jsonify(response_object)
 
 
 @app.route('/api/item_info', methods=['GET'])#아이템 정보 반환해주는 서버 
 def get_itemInfo():
+
+
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
+
     print('item_info')
     response_object = {'status':'success'}
     access_token = request.headers.get('Authorization')
@@ -181,11 +201,17 @@ def get_itemInfo():
         response_object['message'] = 'token error'
     
     print('*'*20,response_object)
+    db.close()
 
     return jsonify(response_object)
 
 @app.route('/api/order_info', methods=['POST'])#아이템 정보 반환해주는 서버 
 def get_orderInfo():
+
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
     print('---------get order_info------------')
     response_object = {'status':'success'}
     post_data = request.get_json()
@@ -232,6 +258,7 @@ def get_orderInfo():
     
 
     print('*'*20,response_object,'*'*20)
+    db.close()
 
     return jsonify(response_object)
 
@@ -239,6 +266,11 @@ def get_orderInfo():
 
 @app.route('/api/order', methods=['POST','PUT'])#발주 저장 
 def put_orderInfo():
+
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
     print('put order')
     response_object = {'status':'success'}
     post_data = request.get_json()
@@ -285,11 +317,17 @@ def put_orderInfo():
         """
     cursor.execute(sql)
     print(cursor.fetchall())
+    db.close()
 
     return jsonify(response_object)
 
 @app.route('/api/my_order_info', methods=['POST'])#발주 저장 
 def get_myOrderInfo():
+
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor = db.cursor()
+
+
     print('----my page------')
     response_object = {'status':'success'}
     post_data = request.get_json()
@@ -341,6 +379,7 @@ def get_myOrderInfo():
             
     response_object['order_info'].append(temp)
     print(response_object)
+    db.close()
 
     return jsonify(response_object)
 

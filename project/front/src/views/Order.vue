@@ -133,18 +133,12 @@
 <script>
 import {mapState, mapActions} from "vuex"
 import store from "../store/index.js"
-// import axios from 'axios'
 
 export default {
      data(){
         return {
             model:null, //선택된 태그 저장
             tag:false, //태그별 보기 필터링
-            // tags:[     
-            // ],
-            // // selected: [],
-            // items:[
-            // ],
             
         }
     },
@@ -161,10 +155,6 @@ export default {
              });
             return sum          
         },
-        // t(){
-        //     console.log('ttttt')
-        //     return 0
-        // },
         filterByTag(){
             if (this.tag===true && this.model!=null && this.model.length>0){
                 return this.items.filter((item)=>{

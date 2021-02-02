@@ -60,6 +60,7 @@
 
 <script>
 import {mapState, mapActions} from "vuex"
+// import store from "../store/index.js"
 // import axios from 'axios';
 
 export default {
@@ -74,6 +75,13 @@ export default {
     },
     methods:{
         ...mapActions(['login']),
+    },
+    watch:{
+        isLogin(newV, oldV){
+            if (oldV!=true && newV===true){
+                this.$router.push({name: 'home'})
+            }
+        }
     }
 }
 </script>

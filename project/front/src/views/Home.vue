@@ -7,13 +7,13 @@
     class="ma-8"
   >
     <v-card-text>
-      <h3>{{storeInfo.headquarters}}</h3>
+      <h3>{{storeInfo.headquarters_name}}</h3>
       <p class="display-1 text--primary">
-        {{storeInfo.location}}점
+        {{storeInfo.store_location}}점
       </p>
       <div class="text--primary">
       <v-icon class="mr-3">{{ 'mdi-phone' }}</v-icon>
-        {{storeInfo.contact}}
+        {{storeInfo.store_contact}}
       </div>
     </v-card-text>
 
@@ -108,7 +108,7 @@
 <script>
 import axios from 'axios';
 import store from "../store/index.js"
-import {mapState , mapActions} from "vuex"  //
+// import {mapState , mapActions} from "vuex"  //
 // @ is an alias to /src
 
 export default {
@@ -118,11 +118,12 @@ export default {
   data(){
     return {
       order:[],
-      date:null
+      date:null,
+      storeInfo:null
     }
   },
   computed:{
-      ...mapState(['storeInfo']),
+      // ...mapState(['storeInfo']),
       total(){
         var sum=0
         this.order.forEach(item => {
@@ -132,7 +133,7 @@ export default {
       }
   },
   methods:{
-      ...mapActions(['getStoreInfo']),
+      // ...mapActions(['getStoreInfo']),
       getOrder() {
           const payload ={
               user_key_id:store.state.userInfo.user_key_id
@@ -148,13 +149,29 @@ export default {
               console.error(error);
               });
       },
+      getStore() {
+          const payload ={
+              store_id:store.state.userInfo.store_id
+          }
+          const path = 'http://localhost:5000/api/store_info'
+          axios.post(path, payload)
+              .then((res) => {
+                console.log("get store info", res.data)
+                this.storeInfo = res.data
+              })
+              .catch((error) => {
+              console.error(error);
+              });
+      },
       setItems(){//store item
         store.state.items=this.order
         this.$router.push({name: 'check'})
       }
   },
   created(){
-    this.getOrder()
+    console.log('created')
+    this.getStore()
+    this.getOrder()   
   }
 };
 </script>

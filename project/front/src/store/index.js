@@ -11,7 +11,7 @@ export default new Vuex.Store({
     isLoginError:false,
     userInfo:null,
     isToken:null,
-    storeInfo:null,
+    // storeInfo:null,
     items:null,
     tags:null
   },
@@ -19,26 +19,16 @@ export default new Vuex.Store({
     //login success
     async loginSucceess(state, payload){
       console.log('======')
-      // if(state.isLogin===false && state.isToken !=true){
-      //   console.log('first login',state.isToken, state.isLogin)
-      //   state.isLogin = true
-      //   state.isLoginError= false
-      //   state.userInfo =payload
-      //   state.isToken = true
-      //   console.log('======',state.isToken, state.isLogin)
-
-      //   await router.push({name:'home'})//js 비동기 잊지 말고 순서 중요한거 async걸기
-      // }else{
-        // console.log('ntimes login',state.isToken, state.isLogin)
+      
+        // if (state.isToken!=true){
+        //   router.push({name: 'check'})
+        // }
         state.isLogin = true
         state.isLoginError= false
         state.userInfo =payload
         state.isToken = true
         console.log('router',router)
         
-        // await router.push({name:'home'})
-      // }
-      // // 
     },
     //login fail
     loginError(state){
@@ -54,11 +44,11 @@ export default new Vuex.Store({
       state.storeInfo=null
       localStorage.removeItem("access_token")
     },
-    getStoreSucceess(state, payload){
+    // getStoreSucceess(state, payload){
 
-      state.storeInfo=payload
+    //   state.storeInfo=payload
 
-    },
+    // },
     getItemSucceess(state, payload){
 
       state.items=payload.itemInfo
@@ -118,33 +108,33 @@ export default new Vuex.Store({
         })
 
     },
-    getStoreInfo({commit}){
+    // getStoreInfo({commit}){
 
-      let token =localStorage.getItem("access_token")
-      let config = {
-        headers:{
-          "Authorization":token
-        }
-      }
-      console.log(config)
-      const path = 'http://localhost:5000/api/store_info';
-      axios
-        .get(path, config)
-        .then(async response =>{
-          let storeInfo = {
-            location:response.data.store_location,
-            contact:response.data.store_contact,
-            headquarters:response.data.headquarters_name 
-          }
-          // console.log(storeInfo)
-         commit("getStoreSucceess", storeInfo)
-        })
-        .catch((error)=>{
-          console.log(error)
-          alert("매장정보 가져오기 실패")
-        })
+    //   let token =localStorage.getItem("access_token")
+    //   let config = {
+    //     headers:{
+    //       "Authorization":token
+    //     }
+    //   }
+    //   console.log(config)
+    //   const path = 'http://localhost:5000/api/store_info';
+    //   axios
+    //     .get(path, config)
+    //     .then(async response =>{
+    //       let storeInfo = {
+    //         location:response.data.store_location,
+    //         contact:response.data.store_contact,
+    //         headquarters:response.data.headquarters_name 
+    //       }
+    //       // console.log(storeInfo)
+    //      commit("getStoreSucceess", storeInfo)
+    //     })
+    //     .catch((error)=>{
+    //       console.log(error)
+    //       alert("매장정보 가져오기 실패")
+    //     })
 
-    },
+    // },
     getItems({commit}){
 
       let token =localStorage.getItem("access_token")
