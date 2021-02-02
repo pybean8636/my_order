@@ -34,7 +34,7 @@
     >
 
       <v-toolbar-title>
-        Latest Order
+        Latest Order <h4>{{this.date}}</h4>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -57,17 +57,21 @@
           Unit
         </th>
         <th class="text-left">
+          Price
+        </th>
+        <th class="text-left">
           Total Price
         </th>
       </tr>
     </thead>
 
     <tbody>
-      <tr>
-        <td>item</td>
-        <td>qty</td>
-        <td>box</td>
-        <td>price</td>
+      <tr v-for="item in order" :key=item.name>
+        <td>{{item.name}}</td>
+        <td>{{item.qty}}</td>
+        <td>{{item.unit}}</td>
+        <td>{{item.price}}</td>
+        <td>{{item.total_price}}</td>
       </tr>
     </tbody>
 
@@ -80,7 +84,7 @@
       bottom
       right
       class="v-btn--example grey darken-3"
-      @click="$router.push({name: 'check'})"
+      @click="setItems"
     >
       <v-icon>mdi-cart-arrow-down</v-icon>
     </v-btn>
@@ -93,6 +97,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+import store from "../store/index.js"
 import {mapState , mapActions} from "vuex"  //
 // @ is an alias to /src
 
@@ -100,11 +106,39 @@ export default {
   name: "home",
   components: {
   },
+  data(){
+    return {
+      order:[],
+      date:null
+    }
+  },
   computed:{
       ...mapState(['storeInfo'])
   },
   methods:{
       ...mapActions(['getStoreInfo']),
+      getOrder() {
+          const payload ={
+              user_key_id:store.state.userInfo.user_key_id
+          }
+          const path = 'http://localhost:5000/api/order_info'
+          axios.post(path, payload)
+              .then((res) => {
+                console.log("get order info")
+                this.order = res.data.order_info
+                this.date = res.data.date
+              })
+              .catch((error) => {
+              console.error(error);
+              });
+      },
+      setItems(){//store item
+        store.state.items=this.order
+        this.$router.push({name: 'check'})
+      }
+  },
+  created(){
+    this.getOrder()
   }
 };
 </script>

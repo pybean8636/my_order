@@ -21,12 +21,12 @@
             <v-slide-group
             multiple
             show-arrows
-            v-model="model"
+            v-model="model" 
             >
                 <v-slide-item
                     v-for="tag in tags"
-                    :key="tag.id"
-                    :value="tag.name"
+                    :key="tag"
+                    :value="tag"
                     v-slot="{ active, toggle }"
                 >
                 <!-- 모델에 선택된 태그들로 필터링하기 위해서 태그 이름을 값으로 배열에 저장 -->
@@ -39,7 +39,7 @@
                     @click="toggle"
                     >
                     <!-- 태그 받아와야 함~! -->
-                    {{ tag.name }}
+                    {{ tag }}
                     </v-btn>
                 </v-slide-item>
             </v-slide-group>
@@ -47,7 +47,7 @@
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
-        <p>{{ model }}</p>
+        <!-- <p>{{ model }}</p> -->
     <div class="d-flex flex-column mb-6">
         <v-card
             v-for="item in filterByTag"
@@ -61,10 +61,10 @@
         <v-row >
             <v-col cols="1" align-self="center">
                 <v-checkbox
-                v-model="selected"
                 :value="item.id"
                 @click="item.check=!item.check"
                 ></v-checkbox>
+                <!-- v-model="selected" -->
             </v-col>
 
              <v-col cols="4" >
@@ -131,113 +131,40 @@
 </template>
 
 <script>
-import {mapState} from "vuex"
+import {mapState, mapActions} from "vuex"
+import store from "../store/index.js"
+// import axios from 'axios'
 
 export default {
      data(){
         return {
-            model:null,
-            tag:false,
-            tags:[
-                {
-                    id:0, 
-                    name:'test',
-                },
-                {
-                    id:1, 
-                    name:'test1',
-                },
-                {
-                    id:2, 
-                    name:'test2',
-                }      
-            ],
-            selected: [],
-            items:[
-                {
-                    id: 1,
-                    name:'item1',
-                    price: 30000,
-                    unit: '박스',
-                    info: '...',
-                    tag:'test',
-                    check:false,
-                    qty:null
-                },
-                {
-                    id: 2,
-                    name:'item2',
-                    price: 30000,
-                    unit: '박스',
-                    info: '...',
-                    tag:'test2',
-                    check:false,
-                    qty:null
-                },
-                {
-                    id: 3,
-                    name:'item3',
-                    price: 30000,
-                    unit: '박스',
-                    info: '...',
-                    tag:'test2',
-                    check:false,
-                    qty:null
-                },
-                {
-                    id: 4,
-                    name:'item4',
-                    price: 30000,
-                    unit: '박스',
-                    info: '...',
-                    tag:'test1',
-                    qty:null
-                },
-                {
-                    id: 5,
-                    name:'item5',
-                    price: 30000,
-                    unit: '박스',
-                    info: '...',
-                    tag:'test',
-                    check:false,
-                    qty:null
-                },
-                {
-                    id: 6,
-                    name:'item6',
-                    price: 30000,
-                    unit: '박스',
-                    info: '...',
-                    tag:'test',
-                    check:false,
-                    qty:null
-                },
-            ],
+            model:null, //선택된 태그 저장
+            tag:false, //태그별 보기 필터링
+            // tags:[     
+            // ],
+            // // selected: [],
+            // items:[
+            // ],
             
         }
     },
     computed:{
         
-        ...mapState(["userInfo"]),
-        total(){
+        ...mapState(["userInfo", 'items', 'tags']),
+        total(){ //총가격저장
             var items=this.items
             var sum=0
             items.forEach(item => {
-                // console.log(item.id,item.qty)
                 if(item.check){
                     sum+=(item.price*item.qty)
                 }
              });
-            //  console.log(sum)
             return sum          
         },
-        // addTag(){
+        // t(){
+        //     console.log('ttttt')
+        //     return 0
         // },
-        t(){
-            console.log('ttttt')
-            return 0
-        },
         filterByTag(){
             if (this.tag===true && this.model!=null && this.model.length>0){
                 return this.items.filter((item)=>{
@@ -247,18 +174,14 @@ export default {
                 return this.items
             }
         },
-        // filterByTag(){
-        //     return this.items.filter((item)=>{
-        //         // console.log(item.id,this.model,'------')
-        //         if(this.model != null){
-        //             return this.model.includes(item.tag)
-        //         }
-        //         else{
-        //             return item
-        //         }
-        //     })
-        // }
         
-    }
+    },
+    methods:{
+        ...mapActions(['getItems']),
+        
+    },
+    created() {
+        store.dispatch('getItems')
+  },
 };
 </script>

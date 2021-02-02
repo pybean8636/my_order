@@ -3,6 +3,13 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "../store/index.js"
 
+// const originalPush = VueRouter.prototype.push;
+// VueRouter.prototype.push = function push(location) {
+//     return originalPush.call(this, location).catch(() => {
+//         return window.location.reload()
+//     })
+// };
+
 Vue.use(VueRouter);
 
 // const onlyUser =async (to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
@@ -16,28 +23,44 @@ Vue.use(VueRouter);
 //     await next()
 //   }
 // }
-const regectAuthUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
-  console.log(store.state.isToken)
-  if(store.state.isToken===true){
-    alert("이미 로그인 되었습니다")
-    next("/")
-  }else{
-    next()
-    console.log('tlqkf')
-  }
-}
+// const regectAuthUser =(to, from, next) =>{//로그인 안된 유저의 다른 페이지 접근 막음
+//   console.log(store.state.isToken)
+//   if(store.state.isToken===true){
+//     alert("이미 로그인 되었습니다")
+//     next("/")
+//   }else{
+//     next()
+//     console.log('tlqkf')
+//   }
+// }
+// function sleep(ms){
+//   var ts1 = new Date().getTime() + ms;
+//   do var ts2 = new Date().getTime(); while (ts2<ts1);
+// }
+
 
 const routerGuard=async (to, from, next) =>{
+  console.log(store.state)
 
-  if(store.state.isLogin===false && store.state.isToken===false){
+  // sleep(1000)
+
+  if(to.name!='login' && store.state.isLogin===false && store.state.isToken===false){
     alert("로그인을 해주세요")
     next("/login")
+  }
+  else if(from.name==='login'&& to.name==='login' && store.state.isLogin===true){
+    console.log("durl")
+    next("/")
   }
   else if(to.name==='home' && store.state.isToken===true){
     await store.dispatch("getStoreInfo")
 
     console.log(store.state.storeInfo)
     await next()
+  }
+  else if(to.name==='login' && store.state.isToken===true){
+    alert("이미 로그인 되었습니다")
+    next("/")
   }
   else{
     next()
@@ -47,10 +70,7 @@ const routerGuard=async (to, from, next) =>{
 }
 
 
-// else if(to.name==='login' && store.state.isToken===true){
-//   alert("이미 로그인 되었습니다")
-//   next("/")
-// }
+
 
 
 
@@ -65,7 +85,7 @@ const routes = [
   {
     path: "/login",
     name: "login",
-    beforeEnter: regectAuthUser,
+    beforeEnter: routerGuard,
     component: () =>
     import(/* webpackChunkName: "login" */ "../views/Login.vue")
   },

@@ -54,7 +54,7 @@
     <v-content>
 
       <!-- If using vue-router -->
-      <router-view></router-view>
+      <router-view :key="$route.fullPath"></router-view>
     </v-content>
 
     <v-fab-transition>
