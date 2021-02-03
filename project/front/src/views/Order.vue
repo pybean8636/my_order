@@ -63,7 +63,10 @@
             max-width="100%"
             :color="item.check? 'indigo lighten-5' : 'white'"
         >
-        <v-row >
+        <!-- 재고 있는 아이템 -->
+        <v-row 
+        v-if="item.stock>10"
+        >
             <v-col cols="1" align-self="center">
                 <v-checkbox
                 :value="item.id"
@@ -93,13 +96,57 @@
             <v-col align-self="center">
                 <v-row >
                     <v-col cols="7 text-right" align-self="center">{{item.price}}원</v-col>
-                    <v-col cols="2" align-self="center">
+                    <v-col cols="3" align-self="center">
                         <v-text-field
                             min="0"
                             type="number"
                             :value="item.qty"
                             v-model.number="item.qty"
+                            :on="item.qty> item.stock ? alert2(item.id) : true "
                         ></v-text-field>
+                    </v-col>
+                    <v-col align-self="center">
+                        {{item.unit}}
+                    </v-col>
+                        
+                </v-row>
+            </v-col>
+
+        </v-row>
+        <!-- 재고부족 -->
+        <v-row 
+        v-else
+        >
+            <v-col cols="1" align-self="center">
+                <v-checkbox
+                :value="item.id"
+                disabled
+                ></v-checkbox>
+                
+            </v-col>
+
+             <v-col cols="4" >
+                 <v-row justify="start">
+                <h3 class="mt-2" >{{ item.name }}</h3>
+                 </v-row>
+                <v-row >
+                    <p align-self="center">{{ item.info }}</p>
+                </v-row>
+                <v-row class="mb-1">
+                    <v-chip
+                        color="indigo lighten-2"
+                        text-color="white"
+                        >
+                        {{item.tag}}
+                    </v-chip>
+                </v-row>
+            </v-col>
+
+            <v-col align-self="center">
+                <v-row >
+                    <v-col cols="7 text-right" align-self="center">{{item.price}}원</v-col>
+                    <v-col cols="2" align-self="center">
+                        out of stock
                     </v-col>
                     <v-col align-self="center">
                         {{item.unit}}
@@ -114,7 +161,6 @@
         <v-col align-self="start" cols="11 text-right" class="my-3">
             <h2>total price</h2>
             <h3 class="mb-6">{{total}}원</h3>
-            
             <v-btn
             color="grey darken-4"
             class="white--text "
@@ -170,15 +216,45 @@ export default {
             }else{
                 return this.items
             }
-        },
+        }
         
     },
     methods:{
-        ...mapActions(['getItems'])
+        ...mapActions(['getItems']),
+        alert2(id){
+            alert('주문 가능 수량 초과\n주문 가능한 최대 수량으로 자동 수정됩니다.')
+            this.items.forEach(item => {
+                if(item.id===id){
+                    item.qty=item.stock
+                }
+                
+            });
+        }
+        // outOfStock(){
+        //     var items=this.items
+        //     items.forEach(item => {
+        //         if(item.qty>item.stock){
+        //             alert('재고가 부족합니다.')
+        //         }
+        //      });
+        // }
         
     },
+    // watch:{
+    //     item(newV){
+    //         console.log(newV)
+    //         // newV.forEach(item => {
+    //         //     if (item.qty > item.stock){
+    //         //         alert('재고 부족!')
+    //         //         console(item.stock)
+    //         //     }
+                
+    //         // });
+    //     }
+    // },
     created() {
         store.dispatch('getItems')
+        // this.outOfStock()
   },
 };
 </script>

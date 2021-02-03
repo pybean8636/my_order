@@ -304,10 +304,13 @@ def put_orderInfo():
         print("info2",info)
         sql="""
             INSERT INTO `prjDB`.`order_detail` (`detail_qty`, `detail_total_price`, `order_id`, `item_id`) VALUES (%s, %s, %s, %s);
-
             """
-
         cursor.execute(sql, (info['qty'], info['qty']*info['price'], id_num, info['id']))
+
+        sql="""
+            UPDATE `prjDB`.`item` SET `item_stock` = %s WHERE (`item_id` = %s);
+            """
+        cursor.execute(sql, (info['stock']-info['qty'], info['id']))
 
     
 
