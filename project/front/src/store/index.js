@@ -13,7 +13,7 @@ export default new Vuex.Store({
     isToken:null,
     // storeInfo:null,
     items:null,
-    tags:null
+    tags:null//태그들 정보
   },
   mutations: {
     //login success

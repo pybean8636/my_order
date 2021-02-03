@@ -3,7 +3,7 @@ from flask_cors import CORS
 import pymysql
 import jwt
 import datetime
-
+import bcrypt
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -34,7 +34,8 @@ def login_auth():
     if rows_count > 0:
         user_info = cursor.fetchone()
         #print('user info:', user_info)
-        if user_pw==user_info[2]:#패스춰드 확인 -> 보안 관련 나중에 수정
+        if bcrypt.checkpw(user_pw.encode('utf-8'), user_info[2].encode('utf-8')):
+        #user_pw==user_info[2]:#패스춰드 확인 -> 보안 관련 나중에 수정
             response_object['message'] = 'login success'
             store_id=user_info[5]
             user_key_id=user_info[0]

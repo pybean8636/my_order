@@ -6,6 +6,7 @@ bin
 lib
 package.json
 package-lock.json
+pw.py
 
 # local env files
 .env.local
