@@ -1,6 +1,6 @@
 <template>
     <v-container class="ma-10">
-        <h2>{{ userInfo.store_location }}점 발주</h2>
+        <h2 class="mb-4">{{ userInfo.store_location }}점 발주</h2>
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
@@ -33,7 +33,7 @@
                 </v-row>
                 <v-row class="mb-1">
                     <v-chip
-                        color="teal"
+                        color="indigo lighten-2"
                         text-color="white"
                         >
                         {{item.tag}}
@@ -62,7 +62,7 @@
             <h3 class="mb-6">{{total}}원</h3>
             
             <v-btn
-            color="teal"
+            color="grey darken-4"
             class="white--text "
             large
             rounded

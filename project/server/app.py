@@ -205,7 +205,7 @@ def get_itemInfo():
 
     return jsonify(response_object)
 
-@app.route('/api/order_info', methods=['POST'])#아이템 정보 반환해주는 서버 
+@app.route('/api/order_info', methods=['POST'])#사용자가 가장 최근 발주한 내역
 def get_orderInfo():
 
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')

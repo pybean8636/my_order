@@ -2,39 +2,39 @@
 <div class="ma-2">
   <!-- 매장정보 -->
   <v-card
-    max-width="900"
+    max-width="90%"
     flat
-    class="ma-8"
+    class="mx-5 mt-10"
   >
     <v-card-text>
-      <h3>{{storeInfo.headquarters_name}}</h3>
-      <p class="display-1 text--primary">
-        {{storeInfo.store_location}}점
-      </p>
-      <div class="text--primary">
-      <v-icon class="mr-3">{{ 'mdi-phone' }}</v-icon>
+     <h2 large class="mb-3"> <v-icon large class="mr-3">{{ 'mdi-storefront-outline' }}</v-icon>{{storeInfo.headquarters_name}}</h2>
+      <h1 class="text--primary mb-2">
+        <v-icon large class="mr-2">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
+      </h1>
+      <p class="button mb-3">
+      <v-icon large class="mr-3">{{ 'mdi-phone' }}</v-icon>
         {{storeInfo.store_contact}}
-      </div>
+      </p>
     </v-card-text>
 
-  <v-divider></v-divider>
+  <v-divider class="mb-8"></v-divider>
   
   </v-card>
-
     <!-- 해당 사용자의 최근 발주 내역 -->
   <v-card
-    elevation="2"
-    max-width="100%"
-    class="ma-8"
+    elevation="0"
+    max-width="90%"
+    class="mx-8"
     max-height="500px"
+    
   >
     <v-toolbar
     :color="'grey darken-4'"
     dark
+    class="rounded-t-xl"
     >
-
       <v-toolbar-title>
-        Latest Order <h4>{{this.date}}</h4>
+        <h4> My Latest Order</h4>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -42,7 +42,9 @@
     </v-toolbar>
 
 
-  <v-card class="overflow-y-auto" max-height="400px">
+  <v-card class="overflow-y-auto" max-height="400px" 
+    elevation="0" outlined>
+    <p class="ma-4 body-2">Date: {{this.date.slice(0, 22)}}</p>
   <v-simple-table width="200px" class="ma-5">
 
     <thead>
@@ -70,15 +72,17 @@
         <td>{{item.name}}</td>
         <td>{{item.qty}}</td>
         <td>{{item.unit}}</td>
-        <td>{{item.price}}</td>
-        <td>{{item.total_price}}</td>
+        <td>{{item.price}}원</td>
+        <td>{{item.total_price}}원</td>
       </tr>
       <tr>
         <td></td>
         <td></td>
         <td></td>
-        <td><h4 class="ma-2 pa-1">합계</h4></td>
-        <h5 class="ma-3 pa-1">{{total}}</h5>
+        <td class="text-left"><h4>합계</h4></td>
+        <td>
+        <h4 class="text-left">{{total}}원</h4>
+        </td>
       </tr>
       
     </tbody>
@@ -92,8 +96,9 @@
       absolute
       bottom
       right
-      class="v-btn--example grey darken-3"
+      class="rounded-xl grey darken-4 mb-1 mr-2"
       @click="setItems"
+      
     >
       <v-icon>mdi-cart-arrow-down</v-icon>
     </v-btn>

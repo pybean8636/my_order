@@ -1,22 +1,27 @@
 <template>
-    <v-container class="ma-10">
+    <v-container class="ma-8">
+        <v-card 
+        class="rounded-t-xl pa-8 indigo lighten-5"
+        flat
+        > 
         <h2>{{ userInfo.store_location }}점 발주</h2>
+        
     <!-- 스위치 -->
       <v-switch
             label="태그별 모아보기 "
-            color="success"
+            color="indigo"
             value="success"
             hide-details
             shaped
             @click="tag = !tag"
-            class="mb-8 "
+            class="mb-4"
         ></v-switch>
 
         <!-- 태그선택 슬라이드 시트 -->
         <v-sheet
         max-width="900"
         v-if="tag"
-        class="mb-5"
+        class="mt-6 indigo lighten-5"
          >
             <v-slide-group
             multiple
@@ -33,7 +38,7 @@
                     <v-btn
                     class="mx-2"
                     :input-value="active"
-                    active-class="teal white--text"
+                    active-class="indigo darken-4 white--text"
                     depressed
                     rounded
                     @click="toggle"
@@ -44,7 +49,7 @@
                 </v-slide-item>
             </v-slide-group>
         </v-sheet>
-
+</v-card>
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
         <!-- <p>{{ model }}</p> -->
@@ -55,16 +60,17 @@
             class="pa-3 ma-1"
             outlined
             tile
-            max-width="93%"
-            :color="item.check? 'teal lighten-5' : 'white'"
+            max-width="100%"
+            :color="item.check? 'indigo lighten-5' : 'white'"
         >
         <v-row >
             <v-col cols="1" align-self="center">
                 <v-checkbox
                 :value="item.id"
                 @click="item.check=!item.check"
+                v-model="selected"
                 ></v-checkbox>
-                <!-- v-model="selected" -->
+                
             </v-col>
 
              <v-col cols="4" >
@@ -76,7 +82,7 @@
                 </v-row>
                 <v-row class="mb-1">
                     <v-chip
-                        color="teal"
+                        color="indigo lighten-2"
                         text-color="white"
                         >
                         {{item.tag}}
@@ -110,7 +116,7 @@
             <h3 class="mb-6">{{total}}원</h3>
             
             <v-btn
-            color="teal"
+            color="grey darken-4"
             class="white--text "
             large
             rounded
@@ -139,6 +145,7 @@ export default {
         return {
             model:null, //선택된 태그 저장
             tag:false, //태그별 보기 필터링
+            selected:[]
             
         }
     },

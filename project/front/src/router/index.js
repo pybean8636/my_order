@@ -8,56 +8,6 @@ import store from "../store/index.js"
 Vue.use(VueRouter);
 
 
-// const routerGuard=(to, from, next) =>{
-//   // if (to.name=='login' && store.state.isToken)
-//   if (to.name!='login' &&store.state.isToken===false){
-//     alert("로그인을 해주세요!")
-//     next("/login")
-//   }else if(to.name==='login'&& store.state.isLogin===true){
-//     alert("이미 로그인 되었습니다!")
-//     store.dispatch("getUserInfo").then(()=>{
-//       next("/")
-//     })
-//   }
-//   // else if(to.name===from.name){
-//   //   console.log('refresh')
-//   // }
-//   else{
-//     store.dispatch("getUserInfo").then(()=>{
-//       next()
-//     })
-//     // store.dispatch("getStoreInfo").then(()=>{
-//     //   next("/")
-//     // })
-//     // store.dispatch("getUserInfo").then(()=>{
-
-//     //   if(to.name!='login' && store.state.isLogin===false && store.state.isToken===false){
-//     //     alert("로그인을 해주세요")
-//     //     next("/login")
-//     //   }
-//     //   else if(from.name==='login'&& to.name==='login' && store.state.isLogin===true){
-//     //     console.log("home 이동")
-//     //     next("/")
-//     //   }
-//     //   else if(to.name==='home' && store.state.isToken===true){
-//     //     store.dispatch("getStoreInfo")
-    
-//     //     console.log(store.state.storeInfo)
-//     //     next()
-//     //   }
-//     //   else if(to.name==='login' && store.state.isToken===true){
-//     //     alert("이미 로그인 되었습니다")
-//     //     next("/")
-//     //   }
-//     //   else{
-//     //     next()
-//     //   }
-
-//     // })
-//   }
-
-// }
-
 const rejectUser=(to, from, next) =>{
 
   if(store.state.isToken===true){
@@ -67,7 +17,6 @@ const rejectUser=(to, from, next) =>{
   else{
     next()
   }
-
 
 }
 

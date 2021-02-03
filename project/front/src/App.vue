@@ -2,7 +2,7 @@
   <v-app id="header">
     
     <v-navigation-drawer
-      class="teal darken-1"
+      class="indigo darken-4 rounded-r-xl"
       dark
       permanent
       fixed
@@ -37,11 +37,11 @@
       </v-list>
 
       <template v-slot:append>
-        <div class="pa-2">
-          <v-btn block class="grey darken-4" v-if="isLogin===false" router :to="{name: 'login'}">
+        <div class="pa-5">
+          <v-btn block class="grey darken-4 " v-if="isLogin===false" router :to="{name: 'login'}">
             Login
           </v-btn>
-          <v-btn block class="grey darken-4" v-else @click="$store.dispatch('logout')">
+          <v-btn block class="grey darken-4 " v-else @click="$store.dispatch('logout')">
             Logout
           </v-btn>
         </div>
@@ -51,11 +51,11 @@
     <!-- Sizes your content based upon application components -->
 
     <!-- Provides the application the proper gutter -->
-    <v-content>
+    <v-main>
 
       <!-- If using vue-router -->
       <router-view :key="$route.fullPath"></router-view>
-    </v-content>
+    </v-main>
 
     <v-fab-transition>
     <v-btn
@@ -104,3 +104,14 @@ export default {
   }
 };
 </script>
+
+<style>
+
+/* @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap'); */
+
+#app{
+  font-family: 'Libre Franklin', sans-serif;
+}
+</style>
+
+

@@ -1,25 +1,38 @@
 <template>
+<div>
+    <v-card
+        flat
+        class="rounded-b-xl indigo lighten-5 mx-10 "
+        height="160px"
+        >
+        <v-row align="center">
+            <v-col cols="12" align="center" class="pt-16">
+                <h2>{{ userInfo.store_location }}점 발주 내역</h2>
+            </v-col>
+        </v-row>
+        </v-card>
+
     <div class="ma-10">
-        <h2>{{ userInfo.store_location }}점 발주 내역</h2>
-        <!-- 나중에 매장아이디로 바꿔서 같은 매장 주문내역 공유 -->
         
         <v-divider class="my-5"></v-divider>
         <v-card
-            elevation="2"
+            flat
             max-width="100%"
-            class="mt-8 pb-2 a-5"
+            class="mt-8 pb-2 a-5 rounded-t-xl" 
             v-for="(order, index) in orders"
             :key="index"
+            outlined
         >
             <v-toolbar
-            :color="'grey darken-2'"
+            :color="'indigo darken-4'"
             dark
             fixed
             height="50px"
+            class="rounded-t-xl"
             >
 
                 <v-toolbar-title>
-                    {{order.date}} Order List
+                    {{order.date.slice(0, 22)}}
                 </v-toolbar-title>
 
                 <v-spacer></v-spacer>
@@ -55,18 +68,20 @@
 
             <tbody>
                 <tr v-for="item in order.order" :key=item.name>
-                    <td>{{item.name}}</td>
-                    <td>{{item.qty}}</td>
-                    <td>{{item.unit}}</td>
-                    <td>{{item.price}}</td>
-                    <td>{{item.total_price}}</td>
+                    <td width="20%">{{item.name}}</td>
+                    <td width="20%">{{item.qty}}</td>
+                    <td width="20%">{{item.unit}}</td>
+                    <td width="20%">{{item.price}}원</td>
+                    <td width="20%">{{item.total_price}}원</td>
                 </tr>
                  <tr>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><h4 class="ma-2 pa-1">합계</h4></td>
-                    <h5 class="ma-3 pa-1">{{total(index)}}</h5>
+                    <td><h4 class="text-left">합계</h4></td>
+                    <td>
+                    <h4 class="text-left">{{total(index)}}원</h4>
+                    </td>
                 </tr>
             </tbody>
 
@@ -78,7 +93,7 @@
             absolute
             bottom
             right
-            class="v-btn--example grey darken-3"
+            class="rounded-xl grey darken-4 mb-1 mr-2"
             @click="setItems(index)"
             >
                 <v-icon>mdi-cart-arrow-down</v-icon>
@@ -87,35 +102,9 @@
         </v-card>
 
 
-
-
-        <!-- <v-card
-            elevation="2"
-            width="900px"
-            class="m7-8"
-        >
-            <v-toolbar
-            :color="'grey darken-2'"
-            class="mb-1"
-            dark
-            >
-
-            <v-toolbar-title>
-                Order List
-            </v-toolbar-title>
-            </v-toolbar>
-
-                <v-treeview
-                activatable
-                color="warning"
-                :items="items"
-                >
-                </v-treeview>
-
-            
-            </v-card> -->
-
     </div>
+        
+</div>
 </template>
 
 <script>
