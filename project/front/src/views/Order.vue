@@ -143,14 +143,15 @@
             </v-col>
 
             <v-col align-self="center">
-                <v-row >
-                    <v-col cols="7 text-right" align-self="center">{{item.price}}원</v-col>
-                    <v-col cols="2" align-self="center">
-                        out of stock
+                <v-row align="center">
+                    
+                    <v-col cols="10 text-right" align-self="center"><h3>out of stock</h3></v-col>
+                    <!-- <v-col cols="2" align-self="center">
+                        
                     </v-col>
                     <v-col align-self="center">
-                        {{item.unit}}
-                    </v-col>
+                        
+                    </v-col> -->
                         
                 </v-row>
             </v-col>
@@ -208,7 +209,7 @@ export default {
              });
             return sum          
         },
-        filterByTag(){
+        filterByTag(){//태그별 보기
             if (this.tag===true && this.model!=null && this.model.length>0){
                 return this.items.filter((item)=>{
                     return this.model.includes(item.tag)
@@ -220,8 +221,8 @@ export default {
         
     },
     methods:{
-        ...mapActions(['getItems']),
-        alert2(id){
+        ...mapActions(['getItems']),//발주 할 수 있는 아이템 가져옴
+        alert2(id){//재고 초과시 알림 
             alert('주문 가능 수량 초과\n주문 가능한 최대 수량으로 자동 수정됩니다.')
             this.items.forEach(item => {
                 if(item.id===id){
@@ -230,28 +231,10 @@ export default {
                 
             });
         }
-        // outOfStock(){
-        //     var items=this.items
-        //     items.forEach(item => {
-        //         if(item.qty>item.stock){
-        //             alert('재고가 부족합니다.')
-        //         }
-        //      });
-        // }
+
         
     },
-    // watch:{
-    //     item(newV){
-    //         console.log(newV)
-    //         // newV.forEach(item => {
-    //         //     if (item.qty > item.stock){
-    //         //         alert('재고 부족!')
-    //         //         console(item.stock)
-    //         //     }
-                
-    //         // });
-    //     }
-    // },
+
     created() {
         store.dispatch('getItems')
         // this.outOfStock()

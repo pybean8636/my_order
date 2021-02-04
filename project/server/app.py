@@ -239,6 +239,7 @@ def get_orderInfo():
 
     response_object['order_info']=[]
     response_object['date']=latest
+    
     for info in order_info:
         
         temp={
@@ -325,7 +326,7 @@ def put_orderInfo():
 
     return jsonify(response_object)
 
-@app.route('/api/my_order_info', methods=['POST'])#발주 저장 
+@app.route('/api/my_order_info', methods=['POST'])#마이메이지
 def get_myOrderInfo():
 
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
@@ -353,15 +354,16 @@ def get_myOrderInfo():
 
     response_object['order_info']=[]
     order_id=orderInfo[0][3]
-    temp={'order':[],'date':orderInfo[0][13]}
-    print(order_id)
+    temp={'order':[],'date':orderInfo[0][13], 'sum':0}
+    # print(order_id)
+    
     for info in orderInfo:
-        print('info',info)
+        # print('info',info)
         if order_id != info[3]:
             print('append')
             response_object['order_info'].append(temp)
             order_id=info[3]
-            temp={'order':[],'date':info[13]}
+            temp={'order':[],'date':info[13], 'sum':0}
             #temp append
             #order_id change
         
@@ -377,6 +379,7 @@ def get_myOrderInfo():
             'tag':info[11],
             'check':True
         }
+        temp['sum']+=info[2]
         if info[11]==None:
             temp2['tag']='기타'
         temp['order'].append(temp2)

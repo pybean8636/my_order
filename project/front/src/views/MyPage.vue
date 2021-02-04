@@ -1,9 +1,10 @@
 <template>
 <div>
+    <!-- 매장명 -->
     <v-card
         flat
         class="rounded-b-xl indigo lighten-5 mx-10 "
-        height="160px"
+        height="170px"
         >
         <v-row align="center">
             <v-col cols="12" align="center" class="pt-16">
@@ -12,9 +13,40 @@
         </v-row>
         </v-card>
 
-    <div class="ma-10">
-        
-        <v-divider class="my-5"></v-divider>
+    <div class="mx-10">
+
+        <!-- 정렬 선택 메뉴 -->
+        <v-col class="text-right pt-8">
+            <v-menu
+            :key="text"
+            :rounded="rounded"
+            offset-y
+            >
+            <template v-slot:activator="{ attrs, on }">
+                <v-btn
+                :color="'grey darken-4'"
+                class="white--text ma-5"
+                v-bind="attrs"
+                v-on="on"
+                >
+                sort options
+                </v-btn>
+            </template>
+
+            <v-list>
+                <v-list-item
+                v-for="list in lists"
+                :key="list"
+                @click="sortBy=list"
+                class="text-center"
+                >
+                <v-list-item-title v-text="list"></v-list-item-title>
+                </v-list-item>
+            </v-list>
+            </v-menu>
+        </v-col>
+
+        <!-- 주문 내역 -->
         <v-card
             flat
             max-width="100%"
@@ -80,13 +112,14 @@
                     <td></td>
                     <td><h4 class="text-left">합계</h4></td>
                     <td>
-                    <h4 class="text-left">{{total(index)}}원</h4>
+                    <h4 class="text-left">{{order.sum}}원</h4>
                     </td>
                 </tr>
             </tbody>
 
             </v-simple-table>
             </v-card>
+            <!-- 똑같이 발주 버튼 -->
             <v-btn
             large
             dark
@@ -115,16 +148,18 @@ import {mapState} from "vuex"
 export default {
      data(){
         return {
-            orders:[]
+            orders:[],//주문 내역
+            lists:['최신순', '금액순'],//정렬 기준 list
+            sortBy:'최신순'//정렬 기준 default:최신순   
             
         }
     },
     computed:{
         
-        ...mapState(["userInfo"])
+        ...mapState(["userInfo"])//사용자 정보
     },
     methods:{
-        getOrders(){
+        getOrders(){//그동안 사용자의 매장 발주 내역 가져오기
             const payload ={
                 store_id:store.state.userInfo.store_id
             }
@@ -138,21 +173,39 @@ export default {
               console.error(error);
               });
         },
-        setItems(index){//store item
+        setItems(index){//store item에 똑같이 주문할 아이템 정보 저장
             console.log('index',index)
             store.state.items=this.orders[index].order
             this.$router.push({name: 'check'})
         },
-        total(index){
-            var sum=0
-            this.orders[index].order.forEach(item => {
-            sum+=(item.price*item.qty)
-            })
-            return sum
+
+        customSort(i, j){//sorting custom
+            if (this.sortBy==='최신순'){
+                if(i.date===j.date){
+                    return 0
+                }
+                return i.date< j.date? 1:-1
+            }
+            else{
+                if(i.sum===j.sum){
+                    return 0
+                }
+                return i.sum< j.sum? 1:-1
+            }
+            
         }
+            
+
     },
     created(){
-        this.getOrders()
+        this.getOrders()//주문 내역 가져오기
+    },
+    watch:{//order sorting
+        sortBy(newV, oldV){
+            if (oldV!=newV){
+                this.orders.sort(this.customSort)
+            }
+        }
     }
 };
 </script>
