@@ -1,10 +1,10 @@
 <template>
-    <v-container class="ma-8">
+    <v-container class="ma-8" max-width="90%">
         <v-card 
-        class="rounded-t-xl pa-8 indigo lighten-5"
+        class="rounded-t-xl pa-10 indigo lighten-5"
         flat
         > 
-        <h2>{{ userInfo.store_location }}점 발주</h2>
+        <h1 class="text-center font-weight-thin mt-5">{{ userInfo.store_location }}점 발주</h1>
         
     <!-- 스위치 -->
       <v-switch
@@ -14,12 +14,11 @@
             hide-details
             shaped
             @click="tag = !tag"
-            class="mb-4"
+            left
         ></v-switch>
 
         <!-- 태그선택 슬라이드 시트 -->
         <v-sheet
-        max-width="900"
         v-if="tag"
         class="mt-6 indigo lighten-5"
          >
@@ -78,7 +77,7 @@
 
              <v-col cols="4" >
                  <v-row justify="start">
-                <h3 class="mt-2" >{{ item.name }}</h3>
+                <h4 class="mt-2 " >{{ item.name }}</h4>
                  </v-row>
                 <v-row >
                     <p align-self="center">{{ item.info }}</p>
@@ -95,7 +94,7 @@
 
             <v-col align-self="center">
                 <v-row >
-                    <v-col cols="7 text-right" align-self="center">{{item.price}}원</v-col>
+                    <v-col cols="6 text-right" align-self="center">{{item.price}}원</v-col>
                     <v-col cols="3" align-self="center">
                         <v-text-field
                             min="0"
@@ -106,7 +105,7 @@
                         ></v-text-field>
                     </v-col>
                     <v-col align-self="center">
-                        {{item.unit}}
+                        <p>{{item.unit}}</p>
                     </v-col>
                         
                 </v-row>
@@ -127,7 +126,7 @@
 
              <v-col cols="4" >
                  <v-row justify="start">
-                <h3 class="mt-2" >{{ item.name }}</h3>
+                <h4 class="mt-2" >{{ item.name }}</h4>
                  </v-row>
                 <v-row >
                     <p align-self="center">{{ item.info }}</p>
@@ -145,7 +144,7 @@
             <v-col align-self="center">
                 <v-row align="center">
                     
-                    <v-col cols="10 text-right" align-self="center"><h3>out of stock</h3></v-col>
+                    <v-col cols="12 text-center"><p class="headline ">SOLD OUT</p></v-col>
                     <!-- <v-col cols="2" align-self="center">
                         
                     </v-col>

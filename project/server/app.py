@@ -220,7 +220,7 @@ def get_orderInfo():
     user_key_id=post_data.get('user_key_id')
     # store_id=post_data['store_id']
     #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
-
+############################################################################################################################################
     sql="""
         SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc;
         """
@@ -236,7 +236,7 @@ def get_orderInfo():
     cursor.execute(sql, (user_key_id, latest))
     order_info = cursor.fetchall()
     # print(item_info)
-
+############################################################################################################################################
     response_object['order_info']=[]
     response_object['date']=latest
     
@@ -317,11 +317,11 @@ def put_orderInfo():
 
     db.commit()
 
-    sql="""
-        SELECT * FROM prjDB.order_detail;
-        """
-    cursor.execute(sql)
-    print(cursor.fetchall())
+    # sql="""
+    #     SELECT * FROM prjDB.order_detail;
+    #     """
+    # cursor.execute(sql)
+    # print(cursor.fetchall())
     db.close()
 
     return jsonify(response_object)

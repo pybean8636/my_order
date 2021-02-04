@@ -1,6 +1,6 @@
 <template>
     <v-container class="ma-10">
-        <h2 class="mb-4">{{ userInfo.store_location }}점 발주</h2>
+        <h2 class="mb-4 font-weight-thin">{{ userInfo.store_location }}점 발주</h2>
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
@@ -26,7 +26,7 @@
             </v-col>
              <v-col cols="4" >
                  <v-row justify="start">
-                <h3 class="mt-2" >{{ item.name }}</h3>
+                <h4 class="mt-2" >{{ item.name }}</h4>
                  </v-row>
                 <v-row >
                     <p align-self="center">{{ item.info }}</p>
@@ -43,12 +43,12 @@
 
             <v-col align-self="center">
                 <v-row >
-                    <v-col cols="7 text-right" align-self="center">{{item.price}}원</v-col>
-                    <v-col cols="2" align-self="center">
-                        <h3>{{item.qty}}</h3>
+                    <v-col cols="7 text-right" align-self="center"><p>{{item.price}}원</p></v-col>
+                    <v-col cols="2" align-self="center" class="text-right">
+                        <p>{{item.qty}}</p>
                     </v-col>
                     <v-col align-self="center">
-                        {{item.unit}}
+                        <p>{{item.unit}}</p>
                     </v-col>
                         
                 </v-row>

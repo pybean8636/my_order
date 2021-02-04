@@ -1,14 +1,15 @@
 <template>
-<div>
+<div class="mx-5">
     <!-- 매장명 -->
     <v-card
         flat
         class="rounded-b-xl indigo lighten-5 mx-10 "
         height="170px"
+        max-width="84%"
         >
         <v-row align="center">
             <v-col cols="12" align="center" class="pt-16">
-                <h2>{{ userInfo.store_location }}점 발주 내역</h2>
+                <h1 class="font-weight-thin">{{ userInfo.store_location }}점 발주 내역</h1>
             </v-col>
         </v-row>
         </v-card>
@@ -16,7 +17,7 @@
     <div class="mx-10">
 
         <!-- 정렬 선택 메뉴 -->
-        <v-col class="text-right pt-8">
+        <v-col class="text-right" cols="11">
             <v-menu
             :key="text"
             :rounded="rounded"
@@ -25,7 +26,7 @@
             <template v-slot:activator="{ attrs, on }">
                 <v-btn
                 :color="'grey darken-4'"
-                class="white--text ma-5"
+                class="white--text mt-8 mx-8"
                 v-bind="attrs"
                 v-on="on"
                 >
@@ -49,11 +50,12 @@
         <!-- 주문 내역 -->
         <v-card
             flat
-            max-width="100%"
-            class="mt-8 pb-2 a-5 rounded-t-xl" 
+            max-width="85%"
+            class="mt-8 pb-2 mx-8 rounded-t-xl" 
             v-for="(order, index) in orders"
             :key="index"
             outlined
+            
         >
             <v-toolbar
             :color="'indigo darken-4'"
@@ -99,7 +101,7 @@
             </thead>
 
             <tbody>
-                <tr v-for="item in order.order" :key=item.name>
+                <tr v-for="item in order.order" :key=item.name class="body-2">
                     <td width="20%">{{item.name}}</td>
                     <td width="20%">{{item.qty}}</td>
                     <td width="20%">{{item.unit}}</td>
@@ -110,9 +112,9 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td><h4 class="text-left">합계</h4></td>
+                    <td><h4 class="text-left subtitle-2">합계</h4></td>
                     <td>
-                    <h4 class="text-left">{{order.sum}}원</h4>
+                    <h4 class="text-left subtitle-2">{{order.sum}}원</h4>
                     </td>
                 </tr>
             </tbody>

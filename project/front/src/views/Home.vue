@@ -1,5 +1,5 @@
 <template>
-<div class="ma-2">
+<div class="ma-2 home">
   <!-- 매장정보 -->
   <v-card
     max-width="90%"
@@ -8,11 +8,11 @@
   >
     <v-card-text>
      <h2 large class="mb-3"> <v-icon large class="mr-3">{{ 'mdi-storefront-outline' }}</v-icon>{{storeInfo.headquarters_name}}</h2>
-      <h1 class="text--primary mb-2">
-        <v-icon large class="mr-2">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
+      <h1 class="text--primary mb-2 font-weight-light">
+        <v-icon large class="mr-3 text--primary">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
       </h1>
       <p class="button mb-3">
-      <v-icon large class="mr-3">{{ 'mdi-phone' }}</v-icon>
+      <v-icon large class="mr-2">{{ 'mdi-phone' }}</v-icon>
         {{storeInfo.store_contact}}
       </p>
     </v-card-text>
@@ -68,7 +68,7 @@
     </thead>
 
     <tbody>
-      <tr v-for="item in order" :key=item.name>
+      <tr v-for="item in order" :key=item.name class="body-2">
         <td>{{item.name}}</td>
         <td>{{item.qty}}</td>
         <td>{{item.unit}}</td>
@@ -79,9 +79,9 @@
         <td></td>
         <td></td>
         <td></td>
-        <td class="text-left"><h4>합계</h4></td>
+        <td class="text-left subtitle-2">합계</td>
         <td>
-        <h4 class="text-left">{{total}}원</h4>
+        <h4 class="text-left subtitle-2">{{total}}원</h4>
         </td>
       </tr>
       
