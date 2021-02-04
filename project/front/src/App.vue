@@ -66,7 +66,6 @@
       fixed
       fab
       dark
-      small
       @click="$vuetify.goTo('#header')"
     >
       <v-icon>mdi-arrow-up-bold</v-icon>

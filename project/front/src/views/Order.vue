@@ -160,7 +160,7 @@
         </v-card>
         <v-col align-self="start" cols="11 text-right" class="my-3">
             <h2>total price</h2>
-            <h3 class="mb-6">{{total}}원</h3>
+            <h3 class="mb-6 font-weight-light">{{total}}원</h3>
             <v-btn
             color="grey darken-4"
             class="white--text "
@@ -168,7 +168,7 @@
             rounded
             @click="$router.push({name: 'check'})"
             >
-                선택 완료
+                <h4>선택 완료</h4>
                 <v-icon
                     right
                     dark
@@ -230,8 +230,20 @@ export default {
                 
             });
         }
-
         
+    },
+    watch:{
+        selected(){//체크박스 선택시 자동으로 1올라가고 해제하면 0으로 초기화
+            this.items.forEach(item => {
+                if (this.selected.includes(item.id)){
+                    item.qty=1
+                }else{
+                    item.qty=0
+                }
+                
+            });
+        }
+
     },
 
     created() {

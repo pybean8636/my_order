@@ -4,18 +4,55 @@
   <v-card
     max-width="90%"
     flat
-    class="mx-5 mt-10"
+    class="mx-7 mt-10"
   >
-    <v-card-text>
+    <!-- <v-card-text>
      <h2 large class="mb-3"> <v-icon large class="mr-3">{{ 'mdi-storefront-outline' }}</v-icon>{{storeInfo.headquarters_name}}</h2>
-      <h1 class="text--primary mb-2 font-weight-light">
-        <v-icon large class="mr-3 text--primary">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
+      <h1 class="text--primary mb-2 ">
+        <v-icon large class="mr-2 text--primary">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
       </h1>
-      <p class="button mb-3">
-      <v-icon large class="mr-2">{{ 'mdi-phone' }}</v-icon>
+      <h3 class="button mb-3">
+      <v-icon class="ml-1">{{ 'mdi-phone-classic' }}</v-icon>
         {{storeInfo.store_contact}}
-      </p>
-    </v-card-text>
+      </h3>
+    </v-card-text> -->
+
+    <v-list>
+      <v-list-item>
+        <v-list-item-icon>
+          <v-icon large color="indigo darken-4">{{ 'mdi-storefront-outline' }}</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>
+            <h3>{{storeInfo.headquarters_name}}</h3>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-icon>
+          <v-icon large color="indigo darken-4">{{ 'mdi-map-marker' }}</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>
+            <h2>{{storeInfo.store_location}}점</h2>
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item>
+        <v-list-item-icon>
+          <v-icon large color="indigo darken-4">{{ 'mdi-phone-classic' }}</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>
+            {{storeInfo.store_contact}}
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+
+    </v-list>
 
   <v-divider class="mb-8"></v-divider>
   

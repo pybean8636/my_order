@@ -14,7 +14,7 @@
         </v-row>
         </v-card>
 
-    <div class="mx-10">
+    <div class="mx-10 mb-8">
 
         <!-- 정렬 선택 메뉴 -->
         <v-col class="text-right" cols="11">
@@ -65,7 +65,7 @@
             class="rounded-t-xl"
             >
 
-                <v-toolbar-title>
+                <v-toolbar-title class="mx-4">
                     {{order.date.slice(0, 22)}}
                 </v-toolbar-title>
 
@@ -75,7 +75,7 @@
             <v-card 
             flat
             max-height="200px"
-            class="overflow-y-auto"
+            class="overflow-y-auto px-3"
             >
             <v-simple-table width="200px"
             >

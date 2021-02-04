@@ -221,24 +221,37 @@ def get_orderInfo():
     # store_id=post_data['store_id']
     #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
 ############################################################################################################################################
-    sql="""
-        SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc;
-        """
-    cursor.execute(sql, user_key_id)
-    latest = cursor.fetchone()
-    latest=latest[0]
+    # sql="""
+    #     SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc;
+    #     """
+    # cursor.execute(sql, user_key_id)
+    # latest = cursor.fetchone()
+    # latest=latest[0]
     
-    sql="""
-        SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag
-        FROM `order`, order_detail, item
-        WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id and order_detail.item_id=item.item_id and `order`.`date`=%s
-        """
-    cursor.execute(sql, (user_key_id, latest))
-    order_info = cursor.fetchall()
+    # sql="""
+    #     SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag
+    #     FROM `order`, order_detail, item
+    #     WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id and order_detail.item_id=item.item_id and `order`.`date`=%s
+    #     """
+    # cursor.execute(sql, (user_key_id, latest))
+    # order_info = cursor.fetchall()
     # print(item_info)
 ############################################################################################################################################
+
+
+    sql="""
+        SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag, `order`.`date`
+        FROM `order`, order_detail, item
+        WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id 
+        and order_detail.item_id=item.item_id 
+        and `order`.`date` = (SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc limit 1);
+        """
+
+    cursor.execute(sql, (user_key_id,user_key_id))
+    order_info = cursor.fetchall()
+
     response_object['order_info']=[]
-    response_object['date']=latest
+    response_object['date']=order_info[0][-1]
     
     for info in order_info:
         
