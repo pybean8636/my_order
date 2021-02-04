@@ -133,7 +133,7 @@
       absolute
       bottom
       right
-      class="rounded-xl grey darken-4 mb-1 mr-2"
+      class="rounded-xl indigo darken-4 mb-1 mr-2"
       @click="setItems"
       
     >
