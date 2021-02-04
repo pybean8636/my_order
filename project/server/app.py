@@ -3,7 +3,7 @@ from flask_cors import CORS
 import pymysql
 import jwt
 import datetime
-
+import bcrypt
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -34,7 +34,8 @@ def login_auth():
     if rows_count > 0:
         user_info = cursor.fetchone()
         #print('user info:', user_info)
-        if user_pw==user_info[2]:#패스춰드 확인 -> 보안 관련 나중에 수정
+        if bcrypt.checkpw(user_pw.encode('utf-8'), user_info[2].encode('utf-8')):
+        #user_pw==user_info[2]:#패스춰드 확인 -> 보안 관련 나중에 수정
             response_object['message'] = 'login success'
             store_id=user_info[5]
             user_key_id=user_info[0]
@@ -205,7 +206,7 @@ def get_itemInfo():
 
     return jsonify(response_object)
 
-@app.route('/api/order_info', methods=['POST'])#아이템 정보 반환해주는 서버 
+@app.route('/api/order_info', methods=['POST'])#사용자가 가장 최근 발주한 내역
 def get_orderInfo():
 
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
@@ -219,25 +220,39 @@ def get_orderInfo():
     user_key_id=post_data.get('user_key_id')
     # store_id=post_data['store_id']
     #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
+############################################################################################################################################
+    # sql="""
+    #     SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc;
+    #     """
+    # cursor.execute(sql, user_key_id)
+    # latest = cursor.fetchone()
+    # latest=latest[0]
+    
+    # sql="""
+    #     SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag
+    #     FROM `order`, order_detail, item
+    #     WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id and order_detail.item_id=item.item_id and `order`.`date`=%s
+    #     """
+    # cursor.execute(sql, (user_key_id, latest))
+    # order_info = cursor.fetchall()
+    # print(item_info)
+############################################################################################################################################
+
 
     sql="""
-        SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc;
-        """
-    cursor.execute(sql, user_key_id)
-    latest = cursor.fetchone()
-    latest=latest[0]
-    
-    sql="""
-        SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag
+        SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag, `order`.`date`
         FROM `order`, order_detail, item
-        WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id and order_detail.item_id=item.item_id and `order`.`date`=%s
+        WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id 
+        and order_detail.item_id=item.item_id 
+        and `order`.`date` = (SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc limit 1);
         """
-    cursor.execute(sql, (user_key_id, latest))
+
+    cursor.execute(sql, (user_key_id,user_key_id))
     order_info = cursor.fetchall()
-    # print(item_info)
 
     response_object['order_info']=[]
-    response_object['date']=latest
+    response_object['date']=order_info[0][-1]
+    
     for info in order_info:
         
         temp={
@@ -303,25 +318,28 @@ def put_orderInfo():
         print("info2",info)
         sql="""
             INSERT INTO `prjDB`.`order_detail` (`detail_qty`, `detail_total_price`, `order_id`, `item_id`) VALUES (%s, %s, %s, %s);
-
             """
-
         cursor.execute(sql, (info['qty'], info['qty']*info['price'], id_num, info['id']))
+
+        sql="""
+            UPDATE `prjDB`.`item` SET `item_stock` = %s WHERE (`item_id` = %s);
+            """
+        cursor.execute(sql, (info['stock']-info['qty'], info['id']))
 
     
 
     db.commit()
 
-    sql="""
-        SELECT * FROM prjDB.order_detail;
-        """
-    cursor.execute(sql)
-    print(cursor.fetchall())
+    # sql="""
+    #     SELECT * FROM prjDB.order_detail;
+    #     """
+    # cursor.execute(sql)
+    # print(cursor.fetchall())
     db.close()
 
     return jsonify(response_object)
 
-@app.route('/api/my_order_info', methods=['POST'])#발주 저장 
+@app.route('/api/my_order_info', methods=['POST'])#마이메이지
 def get_myOrderInfo():
 
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
@@ -349,15 +367,16 @@ def get_myOrderInfo():
 
     response_object['order_info']=[]
     order_id=orderInfo[0][3]
-    temp={'order':[],'date':orderInfo[0][13]}
-    print(order_id)
+    temp={'order':[],'date':orderInfo[0][13], 'sum':0}
+    # print(order_id)
+    
     for info in orderInfo:
-        print('info',info)
+        # print('info',info)
         if order_id != info[3]:
             print('append')
             response_object['order_info'].append(temp)
             order_id=info[3]
-            temp={'order':[],'date':info[13]}
+            temp={'order':[],'date':info[13], 'sum':0}
             #temp append
             #order_id change
         
@@ -373,6 +392,7 @@ def get_myOrderInfo():
             'tag':info[11],
             'check':True
         }
+        temp['sum']+=info[2]
         if info[11]==None:
             temp2['tag']='기타'
         temp['order'].append(temp2)

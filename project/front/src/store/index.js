@@ -13,16 +13,13 @@ export default new Vuex.Store({
     isToken:null,
     // storeInfo:null,
     items:null,
-    tags:null
+    tags:null//태그들 정보
   },
   mutations: {
     //login success
     async loginSucceess(state, payload){
       console.log('======')
       
-        // if (state.isToken!=true){
-        //   router.push({name: 'check'})
-        // }
         state.isLogin = true
         state.isLoginError= false
         state.userInfo =payload
@@ -44,11 +41,7 @@ export default new Vuex.Store({
       state.storeInfo=null
       localStorage.removeItem("access_token")
     },
-    // getStoreSucceess(state, payload){
-
-    //   state.storeInfo=payload
-
-    // },
+   
     getItemSucceess(state, payload){
 
       state.items=payload.itemInfo
@@ -108,33 +101,7 @@ export default new Vuex.Store({
         })
 
     },
-    // getStoreInfo({commit}){
-
-    //   let token =localStorage.getItem("access_token")
-    //   let config = {
-    //     headers:{
-    //       "Authorization":token
-    //     }
-    //   }
-    //   console.log(config)
-    //   const path = 'http://localhost:5000/api/store_info';
-    //   axios
-    //     .get(path, config)
-    //     .then(async response =>{
-    //       let storeInfo = {
-    //         location:response.data.store_location,
-    //         contact:response.data.store_contact,
-    //         headquarters:response.data.headquarters_name 
-    //       }
-    //       // console.log(storeInfo)
-    //      commit("getStoreSucceess", storeInfo)
-    //     })
-    //     .catch((error)=>{
-    //       console.log(error)
-    //       alert("매장정보 가져오기 실패")
-    //     })
-
-    // },
+    
     getItems({commit}){
 
       let token =localStorage.getItem("access_token")

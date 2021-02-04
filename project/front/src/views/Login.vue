@@ -11,12 +11,11 @@
                 </v-alert>
                <v-card>
                    <v-toolbar
-                    dark
-                    color="grey"
+                    color="indigo lighten-5"
                     flat
                     >
                         <v-toolbar-title>
-                            Login
+                            <h3>Login</h3>
                         </v-toolbar-title>
                     </v-toolbar>
                     <div class="pa-5" >
@@ -60,8 +59,6 @@
 
 <script>
 import {mapState, mapActions} from "vuex"
-// import store from "../store/index.js"
-// import axios from 'axios';
 
 export default {
     data(){
