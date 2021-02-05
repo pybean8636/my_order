@@ -145,12 +145,6 @@
                 <v-row align="center">
                     
                     <v-col cols="12 text-center"><p class="headline ">SOLD OUT</p></v-col>
-                    <!-- <v-col cols="2" align-self="center">
-                        
-                    </v-col>
-                    <v-col align-self="center">
-                        
-                    </v-col> -->
                         
                 </v-row>
             </v-col>
@@ -168,7 +162,7 @@
             rounded
             @click="$router.push({name: 'check'})"
             >
-                <h4>선택 완료</h4>
+                <h3>선택완료</h3>
                 <v-icon
                     right
                     dark
@@ -236,7 +230,9 @@ export default {
         selected(){//체크박스 선택시 자동으로 1올라가고 해제하면 0으로 초기화
             this.items.forEach(item => {
                 if (this.selected.includes(item.id)){
-                    item.qty=1
+                    if(item.qty===0){
+                        item.qty=1
+                    }
                 }else{
                     item.qty=0
                 }

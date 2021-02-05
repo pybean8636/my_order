@@ -68,7 +68,7 @@
             rounded
             @click="newOrder"
             >
-                발주
+                <h3>발주</h3>
                 <v-icon
                     right
                     dark
@@ -137,7 +137,7 @@ export default {
     created() {
         // this.selectedItems=store.state.items
         store.state.items.forEach(item => {
-          if (item.check===true){
+          if (item.check===true && item.qty>0){
             this.selectedItems.push(item)
             this.checked.push(item.id)
           }

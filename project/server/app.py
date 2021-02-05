@@ -35,7 +35,7 @@ def login_auth():
         user_info = cursor.fetchone()
         #print('user info:', user_info)
         if bcrypt.checkpw(user_pw.encode('utf-8'), user_info[2].encode('utf-8')):
-        #user_pw==user_info[2]:#패스춰드 확인 -> 보안 관련 나중에 수정
+        
             response_object['message'] = 'login success'
             store_id=user_info[5]
             user_key_id=user_info[0]
@@ -44,9 +44,10 @@ def login_auth():
                 'user_id':user_id,
                 'store_id':store_id
             }
-            token = jwt.encode(payload,'myordertoken', 'HS256')#토큰 생성
+            token = jwt.encode(payload,'myordertoken', 'HS256')#토큰 생성->2개로 추가 ####################
             #print(token)
             response_object['token']= token
+            ###########################################################################################
         else:
             response_object['message'] = 'password error'
             #print('password error')
@@ -68,7 +69,7 @@ def get_userInfo():
 
     response_object = {'status':'success'}
     access_token = request.headers.get('Authorization')
-
+###########################################################################################
     if access_token is not None:
         try:
             payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
@@ -97,7 +98,7 @@ def get_userInfo():
     else:
         response_object['status']="401 Error"
         response_object['message'] = 'token error'
-    
+ ###########################################################################################   
     print('*'*20,response_object)
 
     db.close()

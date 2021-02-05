@@ -56,8 +56,10 @@ export default new Vuex.Store({
         axios
             .post(path, loginOb)
             .then((res) => {
+        ////////////////////////////////////////////////////////////////
               let token = res.data.token
               localStorage.setItem("access_token", token)
+        ////////////////////////////////////////////////////////////////
               dispatch("getUserInfo")//action 실행은 dispatch
               console.log('login post')
         })
@@ -75,15 +77,18 @@ export default new Vuex.Store({
 
       let token =localStorage.getItem("access_token")
       let config = {
+        ////////////////////////////////////////////////////////////////
         headers:{
           "Authorization":token
         }
+        ////////////////////////////////////////////////////////////////
       }
       console.log(config)
       const path = 'http://localhost:5000/api/user_info';
       axios
         .get(path, config)
         .then(response =>{
+        ////////////////////////////////////////////////////////////////
           let userInfo = {
             id:response.data.user_id,
             name:response.data.user_name,
@@ -92,6 +97,7 @@ export default new Vuex.Store({
             store_location:response.data.store_location,
             user_key_id:response.data.user_key_id
           }
+         ////////////////////////////////////////////////////////////////
           commit("loginSucceess", userInfo)
         })
         .catch((error)=>{
