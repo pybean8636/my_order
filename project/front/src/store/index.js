@@ -11,7 +11,6 @@ export default new Vuex.Store({
     isLoginError:false,
     userInfo:null,
     isToken:null,
-    // storeInfo:null,
     items:null,
     tags:null//태그들 정보
   },
@@ -55,12 +54,10 @@ export default new Vuex.Store({
         axios
             .post(path, loginOb)
             .then((res) => {
-        ////////////////////////////////////////////////////////////////
               let access_token = res.data.access_token
               let refresh_token = res.data.refresh_token
               localStorage.setItem("access_token", access_token)
               localStorage.setItem("refresh_token", refresh_token)
-        ////////////////////////////////////////////////////////////////
               dispatch("getUserInfo")//action 실행은 dispatch
               console.log('login post')
         })
@@ -81,19 +78,16 @@ export default new Vuex.Store({
       let access_token =localStorage.getItem("access_token")
       let refresh_token =localStorage.getItem("refresh_token")
       let config = {
-        ////////////////////////////////////////////////////////////////
         headers:{
           "access_Authorization":access_token,
           "refresh_Authorization":refresh_token
         }
-        ////////////////////////////////////////////////////////////////
       }
       console.log(config)
       const path = 'http://localhost:5000/api/user_info';
       axios
         .get(path, config)
         .then(response =>{
-        ////////////////////////////////////////////////////////////////
           let userInfo = {
             id:response.data.user_id,
             name:response.data.user_name,
@@ -103,7 +97,6 @@ export default new Vuex.Store({
             user_key_id:response.data.user_key_id
           }
           localStorage.setItem("access_token", response.data.access_token)
-         ////////////////////////////////////////////////////////////////
           commit("loginSucceess", userInfo)
         })
         .catch((error)=>{
@@ -130,9 +123,8 @@ export default new Vuex.Store({
               .catch((error) => {
               console.error(error);
               });
-
     }
 
-  },//
+  },
   modules: {}
 });

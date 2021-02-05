@@ -50,12 +50,7 @@
       </template>
     </v-navigation-drawer>
 
-    <!-- Sizes your content based upon application components -->
-
-    <!-- Provides the application the proper gutter -->
     <v-main>
-
-      <!-- If using vue-router -->
       <router-view :key="$route.fullPath"></router-view>
     </v-main>
 
@@ -73,7 +68,7 @@
 </v-fab-transition>
 
 
-      <v-footer >
+  <v-footer >
     <v-col
       class="text-center"
       cols="12"

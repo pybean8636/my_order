@@ -9,9 +9,6 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-# db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-# cursor = db.cursor()
-
 @app.route('/', methods=['GET'])
 def test():
     return 'hello'
@@ -63,7 +60,7 @@ def login_auth():
 
             response_object['access_token']= access_token
             response_object['refresh_token']= refresh_token
-            ###########################################################################################
+            
         else:
             response_object['message'] = 'password error'
             #print('password error')
@@ -86,7 +83,7 @@ def get_userInfo():
     response_object = {'status':'success'}
     access_token = request.headers.get('access_Authorization')
     refresh_token = request.headers.get('refresh_Authorization')
-###########################################################################################
+
     if access_token is not None:
         try:##access 만료 전
             payload = jwt.decode(access_token, 'myorderaccesstoken', 'HS256')#토큰 디코딩
@@ -137,7 +134,7 @@ def get_userInfo():
     else:
         response_object['status']="401 Error"
         response_object['message'] = 'access token error'
- ###########################################################################################   
+   
     print('*'*20,response_object)
 
     db.close()
@@ -193,19 +190,7 @@ def get_itemInfo():
 
     # print('item_info')
     response_object = {'status':'success'}
-    # access_token = request.headers.get('access_Authorization')
-    # print(access_token)
-
-    # if access_token is not None:
-    #     try:
-    #         payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
-    #     except jwt.InvalidTokenError:
-    #         response_object['status']="401 Error"
-    #         return Response(status=401)
-        
-    #    #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
-    #     store_id=payload['store_id']
-    # print(store_id)
+ 
     sql="""
         SELECT item.item_id, item.item_name, item.item_price, item.item_stock, item.item_info, item.item_tag, item.item_unit
         FROM item, headquarters, store
@@ -239,9 +224,6 @@ def get_itemInfo():
             response_object['tags'].append(info[5])
         response_object['item_info'].append(temp_object)
 
-    # else:
-    #     response_object['status']="401 Error"
-    #     response_object['message'] = 'token error'
     
     print('*'*20,response_object)
     db.close()
@@ -260,25 +242,6 @@ def get_orderInfo():
     post_data = request.get_json()
     print(post_data)
     user_key_id=post_data.get('user_key_id')
-    # store_id=post_data['store_id']
-    #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
-############################################################################################################################################
-    # sql="""
-    #     SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc;
-    #     """
-    # cursor.execute(sql, user_key_id)
-    # latest = cursor.fetchone()
-    # latest=latest[0]
-    
-    # sql="""
-    #     SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag
-    #     FROM `order`, order_detail, item
-    #     WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id and order_detail.item_id=item.item_id and `order`.`date`=%s
-    #     """
-    # cursor.execute(sql, (user_key_id, latest))
-    # order_info = cursor.fetchall()
-    # print(item_info)
-############################################################################################################################################
 
 
     sql="""
@@ -372,11 +335,6 @@ def put_orderInfo():
 
     db.commit()
 
-    # sql="""
-    #     SELECT * FROM prjDB.order_detail;
-    #     """
-    # cursor.execute(sql)
-    # print(cursor.fetchall())
     db.close()
 
     return jsonify(response_object)
@@ -392,7 +350,6 @@ def get_myOrderInfo():
     response_object = {'status':'success'}
     post_data = request.get_json()
     store_id=post_data.get('store_id')
-    # user_key_id=post_data.get('user_key_id')
 
 
     sql="""
@@ -419,8 +376,6 @@ def get_myOrderInfo():
             response_object['order_info'].append(temp)
             order_id=info[3]
             temp={'order':[],'date':info[13], 'sum':0}
-            #temp append
-            #order_id change
         
         temp2={
             'name':info[6],

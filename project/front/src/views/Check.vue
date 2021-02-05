@@ -4,9 +4,7 @@
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
-        <!-- <p>{{ model }}</p> -->
     <div class="d-flex flex-column mb-6">
-      <!-- {{items}} -->
         <v-card
             v-for="item in selectedItems"
             :key="item.id"
@@ -78,7 +76,6 @@
             </v-btn>
         </v-col>        
     </div>
-  <!-- {{selectedItems}} -->
 
   </v-container>
 </template>
@@ -135,7 +132,6 @@ export default {
       }
     },
     async created() {
-        // this.selectedItems=store.state.items
         await store.state.items.forEach(item => {
           if (item.check===true && item.qty>0){
               if(item.qty>item.stock){

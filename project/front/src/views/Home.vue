@@ -6,16 +6,6 @@
     flat
     class="mx-7 mt-10"
   >
-    <!-- <v-card-text>
-     <h2 large class="mb-3"> <v-icon large class="mr-3">{{ 'mdi-storefront-outline' }}</v-icon>{{storeInfo.headquarters_name}}</h2>
-      <h1 class="text--primary mb-2 ">
-        <v-icon large class="mr-2 text--primary">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
-      </h1>
-      <h3 class="button mb-3">
-      <v-icon class="ml-1">{{ 'mdi-phone-classic' }}</v-icon>
-        {{storeInfo.store_contact}}
-      </h3>
-    </v-card-text> -->
 
     <v-list>
       <v-list-item>
@@ -150,8 +140,6 @@
 <script>
 import axios from 'axios';
 import store from "../store/index.js"
-// import {mapState , mapActions} from "vuex"  //
-// @ is an alias to /src
 
 export default {
   name: "home",
@@ -165,7 +153,6 @@ export default {
     }
   },
   computed:{
-      // ...mapState(['storeInfo']),
       total(){
         var sum=0
         this.order.forEach(item => {
@@ -175,7 +162,6 @@ export default {
       }
   },
   methods:{
-      // ...mapActions(['getStoreInfo']),
       getOrder() {
           const payload ={
               user_key_id:store.state.userInfo.user_key_id

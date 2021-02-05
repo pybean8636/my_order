@@ -51,7 +51,6 @@
 </v-card>
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
-        <!-- <p>{{ model }}</p> -->
     <div class="d-flex flex-column mb-6">
         <v-card
             v-for="item in filterByTag"
