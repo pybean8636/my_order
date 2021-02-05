@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 import pymysql
 import jwt
-import datetime
+from datetime import datetime, timedelta
 import bcrypt
 
 app = Flask(__name__)
@@ -39,14 +39,30 @@ def login_auth():
             response_object['message'] = 'login success'
             store_id=user_info[5]
             user_key_id=user_info[0]
-            payload = {
+
+            payload = {#access payload
                 'user_key_id':user_key_id,
                 'user_id':user_id,
-                'store_id':store_id
+                'store_id':store_id,
+                'exp':datetime.now()+timedelta(hours=2)
             }
-            token = jwt.encode(payload,'myordertoken', 'HS256')#토큰 생성->2개로 추가 ####################
-            #print(token)
-            response_object['token']= token
+            print('access token', payload)
+            access_token = jwt.encode(payload,'myorderaccesstoken', 'HS256')#토큰 생성->2개로 추가 ####################
+            #print(access_token)
+
+
+
+            payload = {#refresh payload
+                'user_key_id':user_key_id,
+                'user_id':user_id,
+                'store_id':store_id,
+                'exp':datetime.now()+timedelta(weeks=2)
+            }
+            refresh_token = jwt.encode(payload,'myorderrefreshtoken', 'HS256')
+
+
+            response_object['access_token']= access_token
+            response_object['refresh_token']= refresh_token
             ###########################################################################################
         else:
             response_object['message'] = 'password error'
@@ -68,14 +84,36 @@ def get_userInfo():
 
 
     response_object = {'status':'success'}
-    access_token = request.headers.get('Authorization')
+    access_token = request.headers.get('access_Authorization')
+    refresh_token = request.headers.get('refresh_Authorization')
 ###########################################################################################
     if access_token is not None:
-        try:
-            payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
-        except jwt.InvalidTokenError:
-            response_object['status']="401 Error"
-            return Response(status=401)
+        try:##access 만료 전
+            payload = jwt.decode(access_token, 'myorderaccesstoken', 'HS256')#토큰 디코딩
+            response_object['message'] = 'access token 만료전'
+
+        except jwt.ExpiredSignatureError:#access 만료 후 재발급
+
+            try:#refresh 확인
+                payload = jwt.decode(access_token, 'myorderrefreshtoken', 'HS256')
+                #access 재발급
+                print("NEW ACCESS TOKEN IS PUBLISHED\n")
+                new_payload = {#access payload
+                    'user_key_id':payload['user_key_id'],
+                    'user_id':payload['user_id'],
+                    'store_id':payload['store_id'],
+                    'exp':datetime.now()+timedelta(seconds=60)
+                }
+                access_token = jwt.encode(new_payload,'myorderaccesstoken', 'HS256')
+
+            except jwt.InvalidTokenError:
+                response_object['status']="401 Error"
+                response_object['message'] = 'refresh token error'
+                return jsonify(response_object)
+
+            # response_object['status']="401 Error"
+            response_object['message'] = 'new access token'
+            # return Response(status=401)
         
         user_id=payload['user_id']#디비 검색 결과 -> 해당 사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 
         store_id=payload['store_id']
@@ -93,11 +131,12 @@ def get_userInfo():
         response_object['store_id']=user_info[3]
         response_object['store_location']=user_info[4]
         response_object['user_key_id']=user_info[5]
+        response_object['access_token']=access_token
 
 
     else:
         response_object['status']="401 Error"
-        response_object['message'] = 'token error'
+        response_object['message'] = 'access token error'
  ###########################################################################################   
     print('*'*20,response_object)
 
@@ -141,66 +180,68 @@ def get_storeInfo():
     return jsonify(response_object)
 
 
-@app.route('/api/item_info', methods=['GET'])#아이템 정보 반환해주는 서버 
+@app.route('/api/item_info', methods=['POST'])#아이템 정보 반환해주는 서버 
 def get_itemInfo():
 
 
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
     cursor = db.cursor()
 
+    post_data = request.get_json()
+    print(post_data)
+    store_id=post_data.get('store_id')
 
-
-    print('item_info')
+    # print('item_info')
     response_object = {'status':'success'}
-    access_token = request.headers.get('Authorization')
-    print(access_token)
+    # access_token = request.headers.get('access_Authorization')
+    # print(access_token)
 
-    if access_token is not None:
-        try:
-            payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
-        except jwt.InvalidTokenError:
-            response_object['status']="401 Error"
-            return Response(status=401)
+    # if access_token is not None:
+    #     try:
+    #         payload = jwt.decode(access_token, 'myordertoken', 'HS256')#토큰 디코딩
+    #     except jwt.InvalidTokenError:
+    #         response_object['status']="401 Error"
+    #         return Response(status=401)
         
-       #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
-        store_id=payload['store_id']
-        print(store_id)
-        sql="""
-            SELECT item.item_id, item.item_name, item.item_price, item.item_stock, item.item_info, item.item_tag, item.item_unit
-            FROM item, headquarters, store
-            WHERE item.headquarters_id=headquarters.headquarters_id and headquarters.headquarters_id=store.headquarters_id and store.store_id=%s;
-            """
-        cursor.execute(sql, store_id)
-        item_info = cursor.fetchall()
-        print(item_info)
+    #    #디비 검색 결과 -> 아이템 아이디, 이름, 가격, 재고, 정보, 태그
+    #     store_id=payload['store_id']
+    # print(store_id)
+    sql="""
+        SELECT item.item_id, item.item_name, item.item_price, item.item_stock, item.item_info, item.item_tag, item.item_unit
+        FROM item, headquarters, store
+        WHERE item.headquarters_id=headquarters.headquarters_id and headquarters.headquarters_id=store.headquarters_id and store.store_id=%s;
+        """
+    cursor.execute(sql, store_id)
+    item_info = cursor.fetchall()
+    print(item_info)
 
-        response_object['item_info']=[]
-        response_object['tags']=['기타']
-        for info in item_info:
-            temp_object={}
+    response_object['item_info']=[]
+    response_object['tags']=['기타']
+    for info in item_info:
+        temp_object={}
 
-            
-            temp_object['id']=info[0]
-            temp_object['name']=info[1]
-            temp_object['price']=info[2]
-            temp_object['stock']=info[3]
-            temp_object['info']=info[4]
+        
+        temp_object['id']=info[0]
+        temp_object['name']=info[1]
+        temp_object['price']=info[2]
+        temp_object['stock']=info[3]
+        temp_object['info']=info[4]
 
-            if info[5]==None:
-                temp_object['tag']='기타'
-            else:
-                temp_object['tag']=info[5]
+        if info[5]==None:
+            temp_object['tag']='기타'
+        else:
+            temp_object['tag']=info[5]
 
-            temp_object['unit']=info[6]
-            temp_object['check']=False #주문 여부 확인 위해 추가   
-            temp_object['qty']=0
-            if info[5] not in response_object['tags'] and info[5]!= None:
-                response_object['tags'].append(info[5])
-            response_object['item_info'].append(temp_object)
+        temp_object['unit']=info[6]
+        temp_object['check']=False #주문 여부 확인 위해 추가   
+        temp_object['qty']=0
+        if info[5] not in response_object['tags'] and info[5]!= None:
+            response_object['tags'].append(info[5])
+        response_object['item_info'].append(temp_object)
 
-    else:
-        response_object['status']="401 Error"
-        response_object['message'] = 'token error'
+    # else:
+    #     response_object['status']="401 Error"
+    #     response_object['message'] = 'token error'
     
     print('*'*20,response_object)
     db.close()
@@ -296,7 +337,7 @@ def put_orderInfo():
     
     
     user_key_id=post_data.get('user_key_id')
-    now = datetime.datetime.now()
+    now = datetime.now()
 
     #order key 가져오기
     sql="""
