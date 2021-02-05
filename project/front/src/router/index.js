@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 
 const rejectUser=(to, from, next) =>{
 
-  if(store.state.isToken===true){
+  if(localStorage.getItem("refresh_token")){
     alert("already!")
     next("/")
   }

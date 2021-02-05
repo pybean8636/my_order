@@ -134,12 +134,18 @@ export default {
                 });
       }
     },
-    created() {
+    async created() {
         // this.selectedItems=store.state.items
-        store.state.items.forEach(item => {
+        await store.state.items.forEach(item => {
           if (item.check===true && item.qty>0){
-            this.selectedItems.push(item)
-            this.checked.push(item.id)
+              if(item.qty>item.stock){
+                alert('발주 실패::재고 부족 \n홈으로 돌아갑니다 ')
+                this.$router.push({name: 'home'})
+              }else{
+                this.selectedItems.push(item)
+                this.checked.push(item.id)
+              }
+
           }
         });
   },

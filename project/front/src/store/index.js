@@ -39,7 +39,6 @@ export default new Vuex.Store({
       state.isToken = null
       state.userInfo=null
       state.storeInfo=null
-      localStorage.removeItem("access_token")
     },
    
     getItemSucceess(state, payload){
@@ -72,6 +71,8 @@ export default new Vuex.Store({
     },
     logout({commit}){
       commit('quitAuth')
+      localStorage.removeItem("access_token")
+      localStorage.removeItem("refresh_token")
       router.push({name:'login'})
       console.log('logout')
     },
