@@ -44,7 +44,7 @@ def login_auth():
                 'exp':datetime.now()+timedelta(hours=2)
             }
             print('access token', payload)
-            access_token = jwt.encode(payload,'myorderaccesstoken', 'HS256')#토큰 생성->2개로 추가 ####################
+            access_token = jwt.encode(payload,'myorderaccesstoken', 'HS256')#토큰 생성-
             #print(access_token)
 
 
@@ -114,11 +114,13 @@ def get_userInfo():
         
         user_id=payload['user_id']#디비 검색 결과 -> 해당 사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 
         store_id=payload['store_id']
+        ####################################################################################################################
         sql="""
-            SELECT user.user_id, user.user_name, user.user_contact, store.store_id, store.store_location,user.user_key_id 
-            FROM user, store 
-            WHERE store.store_id = user.store_id and user_id=%s;
+            SELECT u.user_id, u.user_name, u.user_contact, s.store_id, s.store_location, u.user_key_id 
+            FROM `user` u, store s
+            WHERE s.store_id = u.store_id and u.user_id=%s;
             """
+        ####################################################################################################################
         cursor.execute(sql, user_id)
         user_info = cursor.fetchone()
 
@@ -158,12 +160,13 @@ def get_storeInfo():
 
     
     #디비 검색 결과 -> 해당 매장 위치, 매장 번호, 본사
-
+    ####################################################################################################################
     sql="""
-        SELECT store.store_location, store.store_contact, headquarters.headquarters_name
-        FROM store, headquarters 
-        WHERE store.store_id=%s and headquarters.headquarters_id=store.headquarters_id;
+        SELECT s.store_location, s.store_contact, h.headquarters_name
+        FROM store s, headquarters h 
+        WHERE s.store_id=%s and h.headquarters_id=s.headquarters_id;
         """
+    ####################################################################################################################
     cursor.execute(sql, store_id)
     user_info = cursor.fetchone()
 
@@ -190,12 +193,13 @@ def get_itemInfo():
 
     # print('item_info')
     response_object = {'status':'success'}
- 
+    ####################################################################################################################
     sql="""
-        SELECT item.item_id, item.item_name, item.item_price, item.item_stock, item.item_info, item.item_tag, item.item_unit
-        FROM item, headquarters, store
-        WHERE item.headquarters_id=headquarters.headquarters_id and headquarters.headquarters_id=store.headquarters_id and store.store_id=%s;
+        SELECT i.*
+        FROM item i, store s
+        WHERE i.headquarters_id=s.headquarters_id and s.store_id=%s;
         """
+    ####################################################################################################################
     cursor.execute(sql, store_id)
     item_info = cursor.fetchall()
     print(item_info)
@@ -209,19 +213,20 @@ def get_itemInfo():
         temp_object['id']=info[0]
         temp_object['name']=info[1]
         temp_object['price']=info[2]
-        temp_object['stock']=info[3]
-        temp_object['info']=info[4]
+        temp_object['unit']=info[3]
+        temp_object['stock']=info[4]
+        temp_object['info']=info[5]
 
-        if info[5]==None:
+        if info[6]==None:
             temp_object['tag']='기타'
         else:
-            temp_object['tag']=info[5]
+            temp_object['tag']=info[6]
 
-        temp_object['unit']=info[6]
+        
         temp_object['check']=False #주문 여부 확인 위해 추가   
         temp_object['qty']=0
-        if info[5] not in response_object['tags'] and info[5]!= None:
-            response_object['tags'].append(info[5])
+        if info[6] not in response_object['tags'] and info[6]!= None:
+            response_object['tags'].append(info[6])
         response_object['item_info'].append(temp_object)
 
     
@@ -243,15 +248,15 @@ def get_orderInfo():
     print(post_data)
     user_key_id=post_data.get('user_key_id')
 
-
+    ####################################################################################################################
     sql="""
-        SELECT  item.item_name, order_detail.detail_qty, item.item_unit, item.item_price, order_detail.detail_total_price, item.item_id, item.item_stock, item.item_info, item.item_tag, `order`.`date`
-        FROM `order`, order_detail, item
-        WHERE `order`.user_key_id=%s and `order`.order_id=order_detail.order_id 
-        and order_detail.item_id=item.item_id 
-        and `order`.`date` = (SELECT `order`.`date` FROM `order` WHERE `order`.user_key_id=%s order by date desc limit 1);
+        SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
+        FROM `order` o, order_detail od, item i
+        WHERE o.user_key_id=%s and o.order_id=od.order_id 
+        and od.item_id=i.item_id 
+        and o.`date` = (SELECT o.`date` FROM `order` o WHERE o.user_key_id=%s order by date desc limit 1);
         """
-
+    ####################################################################################################################
     cursor.execute(sql, (user_key_id,user_key_id))
     order_info = cursor.fetchall()
 
@@ -261,15 +266,15 @@ def get_orderInfo():
     for info in order_info:
         
         temp={
-            'name':info[0],
-            'qty':info[1],
-            'unit':info[2],
-            'price':info[3],
-            'total_price':info[4],
-            'id':info[5],
-            'stock':info[6],
-            'info':info[7],
-            'tag':info[8],
+            'name':info[1],
+            'qty':info[8],
+            'unit':info[3],
+            'price':info[2],
+            'total_price':info[9],
+            'id':info[0],
+            'stock':info[4],
+            'info':info[5],
+            'tag':info[6],
             'check':True
         }
         if info[8]==None:
@@ -301,23 +306,24 @@ def put_orderInfo():
     
     user_key_id=post_data.get('user_key_id')
     now = datetime.now()
-
+    ####################################################################################################################
     #order key 가져오기
-    sql="""
-        SELECT `order_id` FROM prjDB.order
-        order by order_id desc;
-        """
-    cursor.execute(sql)
-    id_num=cursor.fetchone()
-    id_num=id_num[0]+1
+    # sql="""
+    #     SELECT `order_id` FROM prjDB.order
+    #     order by order_id desc;
+    #     """
+    # cursor.execute(sql)
+    # id_num=cursor.fetchone()
+    # id_num=id_num[0]+1
 
     #디비 저장
     sql="""
-        INSERT INTO `prjDB`.`order` (`order_id`,`date`, `user_key_id`) VALUES (%s, %s, %s);
+        INSERT INTO `prjDB`.`order` (`date`, `user_key_id`) VALUES (%s, %s);
         """
 
 
-    cursor.execute(sql, (id_num, now.strftime('%Y-%m-%d %H:%M:%S'),user_key_id))
+    cursor.execute(sql, (now.strftime('%Y-%m-%d %H:%M:%S'),user_key_id))
+    id_num=cursor.lastrowid#cursor.fetchone()
 
     for info in orderInfo:
         print("info2",info)
@@ -331,7 +337,7 @@ def put_orderInfo():
             """
         cursor.execute(sql, (info['stock']-info['qty'], info['id']))
 
-    
+    ####################################################################################################################
 
     db.commit()
 
@@ -351,16 +357,17 @@ def get_myOrderInfo():
     post_data = request.get_json()
     store_id=post_data.get('store_id')
 
-
+    ####################################################################################################################
     sql="""
-        SELECT order_detail.* ,item.*, `order`.`date`
-        FROM `order`, order_detail, item
-        WHERE `order`.order_id=order_detail.order_id and order_detail.item_id= item.item_id and `order`.order_id in
-        (SELECT  `order`.order_id
-        FROM `order`, `user`, store
-        WHERE store.store_id =%s and store.store_id = `user`.store_id and `order`.user_key_id=`user`.user_key_id) 
-        order by `order`.order_id DESC;
+        SELECT od.* ,i.*, o.`date`
+        FROM `order` o, order_detail od, item i
+        WHERE  o.order_id=od.order_id and od.item_id= i.item_id and o.order_id in
+        (SELECT  o.order_id
+        FROM `order` o, `user` u
+        WHERE u.store_id=%s and o.user_key_id=u.user_key_id) 
+        order by o.order_id DESC;
         """
+    ####################################################################################################################
     cursor.execute(sql,store_id)
     orderInfo=cursor.fetchall()
 
