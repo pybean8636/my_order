@@ -9,15 +9,15 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
+db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+cursor = db.cursor()
+
 @app.route('/', methods=['GET'])
 def test():
     return 'hello'
 
 @app.route('/api/auth/login', methods=['POST'])
 def login_auth():
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
-
 
     response_object = {'status':'success'}
     post_data = request.get_json()
@@ -68,7 +68,8 @@ def login_auth():
         response_object['message'] = 'ID does not exit'
         #print('does not exit')
 
-    db.close()
+
+        # db.close()
 
     return jsonify(response_object)
 
@@ -76,8 +77,8 @@ def login_auth():
 def get_userInfo():
 
 
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
+    # db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    # cursor = db.cursor()
 
 
     response_object = {'status':'success'}
@@ -114,6 +115,7 @@ def get_userInfo():
         
         user_id=payload['user_id']#디비 검색 결과 -> 해당 사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 
         store_id=payload['store_id']
+      
         ####################################################################################################################
         sql="""
             SELECT u.user_id, u.user_name, u.user_contact, s.store_id, s.store_location, u.user_key_id 
@@ -132,6 +134,9 @@ def get_userInfo():
         response_object['user_key_id']=user_info[5]
         response_object['access_token']=access_token
 
+  
+
+
 
     else:
         response_object['status']="401 Error"
@@ -139,25 +144,25 @@ def get_userInfo():
    
     print('*'*20,response_object)
 
-    db.close()
+    # db.close()
     return jsonify(response_object)
 
 
 @app.route('/api/store_info', methods=['POST'])#매장 정보 반환해주는 서버 
 def get_storeInfo():
+    print("--------get_storeInfo--------")
 
 
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
+    db1 = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor1 = db1.cursor()
 
 
 
     response_object = {'status':'success'}
     post_data = request.get_json()
-    print(post_data)
     store_id=post_data.get('store_id')
 
-
+    print("store_id", store_id)
     
     #디비 검색 결과 -> 해당 매장 위치, 매장 번호, 본사
     ####################################################################################################################
@@ -167,16 +172,15 @@ def get_storeInfo():
         WHERE s.store_id=%s and h.headquarters_id=s.headquarters_id;
         """
     ####################################################################################################################
-    cursor.execute(sql, store_id)
-    user_info = cursor.fetchone()
+    cursor1.execute(sql, store_id)
+    user_info = cursor1.fetchone()
 
     response_object['store_location']=user_info[0]
     response_object['store_contact']=user_info[1]
     response_object['headquarters_name']=user_info[2]
 
-    
-    print('*'*20,response_object)
-    db.close()
+    db1.close()
+    print('store'*20,response_object)
     return jsonify(response_object)
 
 
@@ -184,8 +188,8 @@ def get_storeInfo():
 def get_itemInfo():
 
 
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
+    # db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    # cursor = db.cursor()
 
     post_data = request.get_json()
     print(post_data)
@@ -193,6 +197,7 @@ def get_itemInfo():
 
     # print('item_info')
     response_object = {'status':'success'}
+
     ####################################################################################################################
     sql="""
         SELECT i.*
@@ -231,15 +236,15 @@ def get_itemInfo():
 
     
     print('*'*20,response_object)
-    db.close()
+    # db1.close()
 
     return jsonify(response_object)
 
 @app.route('/api/order_info', methods=['POST'])#사용자가 가장 최근 발주한 내역
 def get_orderInfo():
 
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
+    db2 = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    cursor2 = db2.cursor()
 
 
     print('---------get order_info------------')
@@ -248,42 +253,49 @@ def get_orderInfo():
     print(post_data)
     user_key_id=post_data.get('user_key_id')
 
-    ####################################################################################################################
-    sql="""
-        SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
-        FROM `order` o, order_detail od, item i
-        WHERE o.user_key_id=%s and o.order_id=od.order_id 
-        and od.item_id=i.item_id 
-        and o.`date` = (SELECT o.`date` FROM `order` o WHERE o.user_key_id=%s order by date desc limit 1);
-        """
-    ####################################################################################################################
-    cursor.execute(sql, (user_key_id,user_key_id))
-    order_info = cursor.fetchall()
+    try:
+        with db.cursor() as cursor:
+            ####################################################################################################################
+            sql="""
+                SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
+                FROM `order` o, order_detail od, item i
+                WHERE o.user_key_id=%s and o.order_id=od.order_id 
+                and od.item_id=i.item_id 
+                and o.`date` = (SELECT o.`date` FROM `order` o WHERE o.user_key_id=%s order by date desc limit 1);
+                """
+            ####################################################################################################################
+            cursor2.execute(sql, (user_key_id,user_key_id))
+            order_info = cursor2.fetchall()
 
-    response_object['order_info']=[]
-    response_object['date']=order_info[0][-1]
-    
-    for info in order_info:
-        
-        temp={
-            'name':info[1],
-            'qty':info[8],
-            'unit':info[3],
-            'price':info[2],
-            'total_price':info[9],
-            'id':info[0],
-            'stock':info[4],
-            'info':info[5],
-            'tag':info[6],
-            'check':True
-        }
-        if info[8]==None:
-                temp['tag']='기타'
-        response_object['order_info'].append(temp)
+
+            response_object['order_info']=[]
+            response_object['date']=order_info[0][-1]
+            
+            for info in order_info:
+                
+                temp={
+                    'name':info[1],
+                    'qty':info[8],
+                    'unit':info[3],
+                    'price':info[2],
+                    'total_price':info[9],
+                    'id':info[0],
+                    'stock':info[4],
+                    'info':info[5],
+                    'tag':info[6],
+                    'check':True
+                }
+                if info[8]==None:
+                        temp['tag']='기타'
+                response_object['order_info'].append(temp)
+    except:
+        response_object['message'] = 'DB error'
+    # finally:
+    db2.close()
     
 
     print('*'*20,response_object,'*'*20)
-    db.close()
+    # db.close()
 
     return jsonify(response_object)
 
@@ -292,8 +304,8 @@ def get_orderInfo():
 @app.route('/api/order', methods=['POST','PUT'])#발주 저장 
 def put_orderInfo():
 
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
+    # db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    # cursor = db.cursor()
 
 
     print('put order')
@@ -317,6 +329,7 @@ def put_orderInfo():
     # id_num=id_num[0]+1
 
     #디비 저장
+
     sql="""
         INSERT INTO `prjDB`.`order` (`date`, `user_key_id`) VALUES (%s, %s);
         """
@@ -337,25 +350,28 @@ def put_orderInfo():
             """
         cursor.execute(sql, (info['stock']-info['qty'], info['id']))
 
-    ####################################################################################################################
+    #################################################################################################################### excutemany로 바꿀 수 있는 거는 바꾸기
 
     db.commit()
 
-    db.close()
+
+    # db.close()
 
     return jsonify(response_object)
 
 @app.route('/api/my_order_info', methods=['POST'])#마이메이지
 def get_myOrderInfo():
 
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor = db.cursor()
+    # db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    # cursor = db.cursor()
 
 
     print('----my page------')
     response_object = {'status':'success'}
     post_data = request.get_json()
     store_id=post_data.get('store_id')
+
+
 
     ####################################################################################################################
     sql="""
@@ -370,6 +386,7 @@ def get_myOrderInfo():
     ####################################################################################################################
     cursor.execute(sql,store_id)
     orderInfo=cursor.fetchall()
+
 
     response_object['order_info']=[]
     order_id=orderInfo[0][3]
@@ -402,8 +419,9 @@ def get_myOrderInfo():
         temp['order'].append(temp2)
             
     response_object['order_info'].append(temp)
+
     print(response_object)
-    db.close()
+    # db.close()
 
     return jsonify(response_object)
 

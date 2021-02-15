@@ -162,14 +162,14 @@ export default {
       }
   },
   methods:{
-      getOrder() {
+      async getOrder() {
           const payload ={
               user_key_id:store.state.userInfo.user_key_id
           }
           const path = 'http://localhost:5000/api/order_info'
           axios.post(path, payload)
               .then((res) => {
-                console.log("get order info")
+                console.log("2 get order info")
                 this.order = res.data.order_info
                 this.date = res.data.date
               })
@@ -177,14 +177,14 @@ export default {
               console.error(error);
               });
       },
-      getStore() {
+      async getStore() {
           const payload ={
               store_id:store.state.userInfo.store_id
           }
           const path = 'http://localhost:5000/api/store_info'
           axios.post(path, payload)
               .then((res) => {
-                console.log("get store info", res.data)
+                console.log("1 get store info", res.data)
                 this.storeInfo = res.data
               })
               .catch((error) => {
@@ -194,12 +194,15 @@ export default {
       setItems(){//store item
         store.state.items=this.order
         this.$router.push({name: 'check'})
+      },
+      func(){ 
+        this.getStore()
+        this.getOrder() 
       }
   },
-  created(){
-    console.log('created')
-    this.getStore()
-    this.getOrder()   
+  async created(){
+     console.log('created')
+     await this.func()
   }
 };
 </script>
