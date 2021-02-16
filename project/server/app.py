@@ -153,8 +153,8 @@ def get_storeInfo():
     print("--------get_storeInfo--------")
 
 
-    store_db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    store_cursor = store_db.cursor()
+    # store_db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    # store_cursor = store_db.cursor()
 
 
 
@@ -172,14 +172,14 @@ def get_storeInfo():
         WHERE s.store_id=%s and h.headquarters_id=s.headquarters_id;
         """
     ####################################################################################################################
-    store_cursor.execute(sql, store_id)
-    user_info = store_cursor.fetchone()
+    cursor.execute(sql, store_id)
+    user_info = cursor.fetchone()
 
     response_object['store_location']=user_info[0]
     response_object['store_contact']=user_info[1]
     response_object['headquarters_name']=user_info[2]
 
-    store_db.close()
+    # store_db.close()
     print('store'*20,response_object)
     return jsonify(response_object)
 
@@ -243,8 +243,8 @@ def get_itemInfo():
 @app.route('/api/order_info', methods=['POST'])#사용자가 가장 최근 발주한 내역
 def get_orderInfo():
 
-    latest_order_db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    order_cursor = latest_order_db.cursor()
+    # latest_order_db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    # order_cursor = latest_order_db.cursor()
 
 
     print('---------get order_info------------')
@@ -253,45 +253,43 @@ def get_orderInfo():
     print(post_data)
     user_key_id=post_data.get('user_key_id')
 
-    try:
-        with db.cursor() as cursor:
-            ####################################################################################################################
-            sql="""
-                SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
-                FROM `order` o, order_detail od, item i
-                WHERE o.user_key_id=%s and o.order_id=od.order_id 
-                and od.item_id=i.item_id 
-                and o.`date` = (SELECT o.`date` FROM `order` o WHERE o.user_key_id=%s order by date desc limit 1);
-                """
-            ####################################################################################################################
-            order_cursor.execute(sql, (user_key_id,user_key_id))
-            order_info = order_cursor.fetchall()
+    
+    ####################################################################################################################
+    sql="""
+        SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
+        FROM `order` o, order_detail od, item i
+        WHERE o.user_key_id=%s and o.order_id=od.order_id 
+        and od.item_id=i.item_id 
+        and o.`date` = (SELECT o.`date` FROM `order` o WHERE o.user_key_id=%s order by date desc limit 1);
+        """
+    ####################################################################################################################
+    cursor.execute(sql, (user_key_id,user_key_id))
+    order_info = cursor.fetchall()
 
 
-            response_object['order_info']=[]
-            response_object['date']=order_info[0][-1]
-            
-            for info in order_info:
-                
-                temp={
-                    'name':info[1],
-                    'qty':info[8],
-                    'unit':info[3],
-                    'price':info[2],
-                    'total_price':info[9],
-                    'id':info[0],
-                    'stock':info[4],
-                    'info':info[5],
-                    'tag':info[6],
-                    'check':True
-                }
-                if info[8]==None:
-                        temp['tag']='기타'
-                response_object['order_info'].append(temp)
-    except:
-        response_object['message'] = 'DB error'
+    response_object['order_info']=[]
+    response_object['date']=order_info[0][-1]
+    
+    for info in order_info:
+        
+        temp={
+            'name':info[1],
+            'qty':info[8],
+            'unit':info[3],
+            'price':info[2],
+            'total_price':info[9],
+            'id':info[0],
+            'stock':info[4],
+            'info':info[5],
+            'tag':info[6],
+            'check':True
+        }
+        if info[8]==None:
+                temp['tag']='기타'
+        response_object['order_info'].append(temp)
+ 
     # finally:
-    latest_order_db.close()
+    # latest_order_db.close()
     
 
     print('*'*20,response_object,'*'*20)

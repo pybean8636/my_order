@@ -167,7 +167,7 @@ export default {
               user_key_id:store.state.userInfo.user_key_id
           }
           const path = 'http://localhost:5000/api/order_info'
-          axios.post(path, payload)
+          await axios.post(path, payload)
               .then((res) => {
                 console.log("2 get order info", res.data)
                 this.order = res.data.order_info
@@ -182,7 +182,7 @@ export default {
               store_id:store.state.userInfo.store_id
           }
           const path = 'http://localhost:5000/api/store_info'
-          axios.post(path, payload)
+          await axios.post(path, payload)
               .then((res) => {
                 console.log("1 get store info", res.data)
                 this.storeInfo = res.data
@@ -201,7 +201,7 @@ export default {
       //   await this.getOrder() 
       // }
   },
-  async created(){
+  async mounted(){
     //  console.log('created')
     //  this.getInfo()
     await this.getStore()
