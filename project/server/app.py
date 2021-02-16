@@ -153,8 +153,8 @@ def get_storeInfo():
     print("--------get_storeInfo--------")
 
 
-    db1 = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor1 = db1.cursor()
+    store_db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    store_cursor = store_db.cursor()
 
 
 
@@ -172,14 +172,14 @@ def get_storeInfo():
         WHERE s.store_id=%s and h.headquarters_id=s.headquarters_id;
         """
     ####################################################################################################################
-    cursor1.execute(sql, store_id)
-    user_info = cursor1.fetchone()
+    store_cursor.execute(sql, store_id)
+    user_info = store_cursor.fetchone()
 
     response_object['store_location']=user_info[0]
     response_object['store_contact']=user_info[1]
     response_object['headquarters_name']=user_info[2]
 
-    db1.close()
+    store_db.close()
     print('store'*20,response_object)
     return jsonify(response_object)
 
@@ -243,8 +243,8 @@ def get_itemInfo():
 @app.route('/api/order_info', methods=['POST'])#사용자가 가장 최근 발주한 내역
 def get_orderInfo():
 
-    db2 = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    cursor2 = db2.cursor()
+    latest_order_db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    order_cursor = latest_order_db.cursor()
 
 
     print('---------get order_info------------')
@@ -264,8 +264,8 @@ def get_orderInfo():
                 and o.`date` = (SELECT o.`date` FROM `order` o WHERE o.user_key_id=%s order by date desc limit 1);
                 """
             ####################################################################################################################
-            cursor2.execute(sql, (user_key_id,user_key_id))
-            order_info = cursor2.fetchall()
+            order_cursor.execute(sql, (user_key_id,user_key_id))
+            order_info = order_cursor.fetchall()
 
 
             response_object['order_info']=[]
@@ -291,7 +291,7 @@ def get_orderInfo():
     except:
         response_object['message'] = 'DB error'
     # finally:
-    db2.close()
+    latest_order_db.close()
     
 
     print('*'*20,response_object,'*'*20)

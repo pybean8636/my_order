@@ -1,4 +1,5 @@
 <template>
+<div v-if="items != null">
     <v-container class="ma-8" max-width="90%">
         <v-card 
         class="rounded-t-xl pa-10 indigo lighten-5"
@@ -173,6 +174,7 @@
     </div>
 
   </v-container>
+</div>
 </template>
 
 <script>

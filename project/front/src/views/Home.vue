@@ -1,5 +1,5 @@
 <template>
-<div class="ma-2 home">
+<div v-if="storeInfo != null && date != null" class="ma-2 home">
   <!-- 매장정보 -->
   <v-card
     max-width="90%"
@@ -169,7 +169,7 @@ export default {
           const path = 'http://localhost:5000/api/order_info'
           axios.post(path, payload)
               .then((res) => {
-                console.log("2 get order info")
+                console.log("2 get order info", res.data)
                 this.order = res.data.order_info
                 this.date = res.data.date
               })
@@ -195,14 +195,17 @@ export default {
         store.state.items=this.order
         this.$router.push({name: 'check'})
       },
-      func(){ 
-        this.getStore()
-        this.getOrder() 
-      }
+      // async getInfo(){ 
+      //   console.log("getInfo")
+      //   await this.getStore()
+      //   await this.getOrder() 
+      // }
   },
   async created(){
-     console.log('created')
-     await this.func()
+    //  console.log('created')
+    //  this.getInfo()
+    await this.getStore()
+    await this.getOrder() 
   }
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
   <v-app id="header">
     
-    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Libre+Franklin&display=swap" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Jua&family=Libre+Franklin&display=swap" rel="stylesheet"> -->
     <v-navigation-drawer
       class="indigo darken-4 rounded-r-xl"
       dark
