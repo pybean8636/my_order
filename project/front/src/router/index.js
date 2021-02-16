@@ -21,7 +21,7 @@ const rejectUser=(to, from, next) =>{
 }
 
 const guard=(to, from, next)=>{
-  if (store.state.isToken===false){
+  if (localStorage.getItem("refresh_token")===null){
     alert("login first!")
     next("/login")
   }

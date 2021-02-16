@@ -9,8 +9,6 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 CORS(app, resources={r'/*': {'origins': '*'}})
 
-db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-cursor = db.cursor()
 
 @app.route('/', methods=['GET'])
 def test():
@@ -284,7 +282,7 @@ def get_orderInfo():
             'tag':info[6],
             'check':True
         }
-        if info[8]==None:
+        if temp['tag']==None:
                 temp['tag']='기타'
         response_object['order_info'].append(temp)
  
@@ -425,4 +423,11 @@ def get_myOrderInfo():
 
 
 if __name__ == '__main__':
-    app.run()
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    try:
+        with db.cursor() as curs:
+            cursor = db.cursor()
+            app.run()
+    finally:
+        db.close()
+    

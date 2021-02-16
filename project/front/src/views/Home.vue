@@ -195,15 +195,10 @@ export default {
         store.state.items=this.order
         this.$router.push({name: 'check'})
       },
-      // async getInfo(){ 
-      //   console.log("getInfo")
-      //   await this.getStore()
-      //   await this.getOrder() 
-      // }
+
   },
   async mounted(){
-    //  console.log('created')
-    //  this.getInfo()
+
     await this.getStore()
     await this.getOrder() 
   }
