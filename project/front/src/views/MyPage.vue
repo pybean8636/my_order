@@ -19,8 +19,6 @@
         <!-- 정렬 선택 메뉴 -->
         <v-col class="text-right" cols="11">
             <v-menu
-            :key="text"
-            :rounded="rounded"
             offset-y
             >
             <template v-slot:activator="{ attrs, on }">

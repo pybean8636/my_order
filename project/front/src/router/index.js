@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 
 const rejectUser=(to, from, next) =>{
 
-  if(store.state.isToken===true){
+  if(localStorage.getItem("refresh_token")){
     alert("already!")
     next("/")
   }
@@ -21,7 +21,7 @@ const rejectUser=(to, from, next) =>{
 }
 
 const guard=(to, from, next)=>{
-  if (store.state.isToken===false){
+  if (localStorage.getItem("refresh_token")===null){
     alert("login first!")
     next("/login")
   }

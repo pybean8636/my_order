@@ -11,7 +11,6 @@ export default new Vuex.Store({
     isLoginError:false,
     userInfo:null,
     isToken:null,
-    // storeInfo:null,
     items:null,
     tags:null//태그들 정보
   },
@@ -39,7 +38,6 @@ export default new Vuex.Store({
       state.isToken = null
       state.userInfo=null
       state.storeInfo=null
-      localStorage.removeItem("access_token")
     },
    
     getItemSucceess(state, payload){
@@ -56,8 +54,10 @@ export default new Vuex.Store({
         axios
             .post(path, loginOb)
             .then((res) => {
-              let token = res.data.token
-              localStorage.setItem("access_token", token)
+              let access_token = res.data.access_token
+              let refresh_token = res.data.refresh_token
+              localStorage.setItem("access_token", access_token)
+              localStorage.setItem("refresh_token", refresh_token)
               dispatch("getUserInfo")//action 실행은 dispatch
               console.log('login post')
         })
@@ -68,15 +68,19 @@ export default new Vuex.Store({
     },
     logout({commit}){
       commit('quitAuth')
+      localStorage.removeItem("access_token")
+      localStorage.removeItem("refresh_token")
       router.push({name:'login'})
       console.log('logout')
     },
     getUserInfo({commit}){
 
-      let token =localStorage.getItem("access_token")
+      let access_token =localStorage.getItem("access_token")
+      let refresh_token =localStorage.getItem("refresh_token")
       let config = {
         headers:{
-          "Authorization":token
+          "access_Authorization":access_token,
+          "refresh_Authorization":refresh_token
         }
       }
       console.log(config)
@@ -92,6 +96,7 @@ export default new Vuex.Store({
             store_location:response.data.store_location,
             user_key_id:response.data.user_key_id
           }
+          localStorage.setItem("access_token", response.data.access_token)
           commit("loginSucceess", userInfo)
         })
         .catch((error)=>{
@@ -103,16 +108,11 @@ export default new Vuex.Store({
     },
     
     getItems({commit}){
-
-      let token =localStorage.getItem("access_token")
-      let config = {
-        headers:{
-          "Authorization":token
-        }
+      const payload ={
+        store_id: this.state.userInfo.store_id
       }
-      console.log(config)
       const path = 'http://localhost:5000/api/item_info';
-          axios.get(path, config)
+          axios.post(path, payload)
               .then((response) => {
               let info={
                 itemInfo:response.data.item_info,
@@ -123,9 +123,8 @@ export default new Vuex.Store({
               .catch((error) => {
               console.error(error);
               });
-
     }
 
-  },//
+  },
   modules: {}
 });

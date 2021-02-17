@@ -1,21 +1,11 @@
 <template>
-<div class="ma-2 home">
+<div v-if="storeInfo != null && date != null" class="ma-2 home">
   <!-- 매장정보 -->
   <v-card
     max-width="90%"
     flat
     class="mx-7 mt-10"
   >
-    <!-- <v-card-text>
-     <h2 large class="mb-3"> <v-icon large class="mr-3">{{ 'mdi-storefront-outline' }}</v-icon>{{storeInfo.headquarters_name}}</h2>
-      <h1 class="text--primary mb-2 ">
-        <v-icon large class="mr-2 text--primary">{{ 'mdi-map-marker' }}</v-icon>{{storeInfo.store_location}}점
-      </h1>
-      <h3 class="button mb-3">
-      <v-icon class="ml-1">{{ 'mdi-phone-classic' }}</v-icon>
-        {{storeInfo.store_contact}}
-      </h3>
-    </v-card-text> -->
 
     <v-list>
       <v-list-item>
@@ -150,8 +140,6 @@
 <script>
 import axios from 'axios';
 import store from "../store/index.js"
-// import {mapState , mapActions} from "vuex"  //
-// @ is an alias to /src
 
 export default {
   name: "home",
@@ -165,7 +153,6 @@ export default {
     }
   },
   computed:{
-      // ...mapState(['storeInfo']),
       total(){
         var sum=0
         this.order.forEach(item => {
@@ -175,15 +162,14 @@ export default {
       }
   },
   methods:{
-      // ...mapActions(['getStoreInfo']),
-      getOrder() {
+      async getOrder() {
           const payload ={
               user_key_id:store.state.userInfo.user_key_id
           }
           const path = 'http://localhost:5000/api/order_info'
-          axios.post(path, payload)
+          await axios.post(path, payload)
               .then((res) => {
-                console.log("get order info")
+                console.log("2 get order info", res.data)
                 this.order = res.data.order_info
                 this.date = res.data.date
               })
@@ -191,14 +177,14 @@ export default {
               console.error(error);
               });
       },
-      getStore() {
+      async getStore() {
           const payload ={
               store_id:store.state.userInfo.store_id
           }
           const path = 'http://localhost:5000/api/store_info'
-          axios.post(path, payload)
+          await axios.post(path, payload)
               .then((res) => {
-                console.log("get store info", res.data)
+                console.log("1 get store info", res.data)
                 this.storeInfo = res.data
               })
               .catch((error) => {
@@ -208,12 +194,13 @@ export default {
       setItems(){//store item
         store.state.items=this.order
         this.$router.push({name: 'check'})
-      }
+      },
+
   },
-  created(){
-    console.log('created')
-    this.getStore()
-    this.getOrder()   
+  async mounted(){
+
+    await this.getStore()
+    await this.getOrder() 
   }
 };
 </script>
