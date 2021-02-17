@@ -108,7 +108,7 @@ export default {
         },
     },
     methods:{
-        newOrder() {
+        async newOrder() {
             
             const payload ={
               items:this.selectedItems.filter((item)=>{
@@ -119,7 +119,7 @@ export default {
 
             console.log('payload',payload)
             const path = 'http://localhost:5000/api/order'
-            axios.put(path, payload)
+            await axios.put(path, payload)
                 .then(() => {
                   alert('발주 성공. 홈으로 돌아갑니다 ')
                   console.log("order success")

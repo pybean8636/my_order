@@ -111,7 +111,7 @@ def get_userInfo():
             response_object['message'] = 'new access token'
             # return Response(status=401)
         
-        user_id=payload['user_id']#디비 검색 결과 -> 해당 사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 
+        user_id=payload['user_id']#디비 검색 결과 -> 해당 사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 , user key
         store_id=payload['store_id']
       
         ####################################################################################################################
@@ -252,7 +252,7 @@ def get_orderInfo():
     user_key_id=post_data.get('user_key_id')
 
     
-    ####################################################################################################################
+    ##############################################        #################################################################
     sql="""
         SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
         FROM `order` o, order_detail od, item i
@@ -334,21 +334,45 @@ def put_orderInfo():
     cursor.execute(sql, (now.strftime('%Y-%m-%d %H:%M:%S'),user_key_id))
     id_num=cursor.lastrowid#cursor.fetchone()
 
+    insert_list=[]
+    update_list=[]
+
+    # for info in orderInfo:
+    #     print("info2",info)
+    #     sql="""
+    #         INSERT INTO `prjDB`.`order_detail` (`detail_qty`, `detail_total_price`, `order_id`, `item_id`) VALUES (%s, %s, %s, %s);
+    #         """
+    #     cursor.execute(sql, (info['qty'], info['qty']*info['price'], id_num, info['id']))
+
+    #     sql="""
+    #         UPDATE `prjDB`.`item` SET `item_stock` = %s WHERE (`item_id` = %s);
+    #         """
+    #     cursor.execute(sql, (info['stock']-info['qty'], info['id']))
+
+    ##############################################################       ################################################### excutemany
     for info in orderInfo:
-        print("info2",info)
-        sql="""
-            INSERT INTO `prjDB`.`order_detail` (`detail_qty`, `detail_total_price`, `order_id`, `item_id`) VALUES (%s, %s, %s, %s);
-            """
-        cursor.execute(sql, (info['qty'], info['qty']*info['price'], id_num, info['id']))
+        insert_list.append([info['qty'], info['qty']*info['price'], id_num, info['id']])
+        update_list.append([info['stock']-info['qty'], info['id']])
 
-        sql="""
-            UPDATE `prjDB`.`item` SET `item_stock` = %s WHERE (`item_id` = %s);
-            """
-        cursor.execute(sql, (info['stock']-info['qty'], info['id']))
+    
+    sql="""
+        INSERT INTO `prjDB`.`order_detail` (`detail_qty`, `detail_total_price`, `order_id`, `item_id`) VALUES (%s, %s, %s, %s);
+        """
+    cursor.executemany(sql, insert_list)
 
-    #################################################################################################################### excutemany로 바꿀 수 있는 거는 바꾸기
 
     db.commit()
+
+    sql="""
+        UPDATE `prjDB`.`item` SET `item_stock` = %s WHERE (`item_id` = %s);
+    """
+    cursor.executemany(sql, update_list)
+
+    db.commit()
+
+
+
+   
 
 
     # db.close()
@@ -369,14 +393,14 @@ def get_myOrderInfo():
 
 
 
-    ####################################################################################################################
+    ############################################################       ########################################################
     sql="""
         SELECT od.* ,i.*, o.`date`
         FROM `order` o, order_detail od, item i
         WHERE  o.order_id=od.order_id and od.item_id= i.item_id and o.order_id in
         (SELECT  o.order_id
         FROM `order` o, `user` u
-        WHERE u.store_id=%s and o.user_key_id=u.user_key_id) 
+        WHERE u.store_id=%s and o.user_key_id=u.user_key_id)  
         order by o.order_id DESC;
         """
     ####################################################################################################################
