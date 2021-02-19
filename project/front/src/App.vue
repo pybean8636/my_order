@@ -95,6 +95,7 @@ export default {
           { title: 'Home', icon: 'mdi-home', name: 'home' },
           { title: 'My Page', icon: 'mdi-archive', name: 'my_page'},
           { title: 'Order', icon: 'mdi-cart', name: 'order' },
+          { title: 'Dash Board', icon: 'mdi-chart-bar', name: 'board' },
         ],
   }),
   computed:{

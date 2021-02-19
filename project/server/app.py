@@ -382,9 +382,6 @@ def put_orderInfo():
 @app.route('/api/my_order_info', methods=['POST'])#마이메이지
 def get_myOrderInfo():
 
-    # db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
-    # cursor = db.cursor()
-
 
     print('----my page------')
     response_object = {'status':'success'}
@@ -444,6 +441,115 @@ def get_myOrderInfo():
     # db.close()
 
     return jsonify(response_object)
+
+
+@app.route('/api/dash_board_summary', methods=['POST'])#메인 홈 요약 대시보드
+def dash_board_summary():
+
+    print('----dash_board_summary------')
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    store_id=post_data.get('store_id')
+
+
+
+    ##################################################### 1   ########################################################
+    sql="""
+        SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, count(o.order_id) `count`, sum(od.detail_total_price) sum
+        FROM `order` o, order_detail od, `user` u
+        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+            and o.user_key_id = u.user_key_id
+            and o.order_id = od.order_id
+            and u.store_id=%s
+        group by `day`
+        order by `day`;
+        """
+    ####################################################################################################################
+    cursor.execute(sql,store_id)
+    orderInfo=cursor.fetchall()
+
+
+    response_object['frq']=[]#빈도
+    response_object['payment']=[]#지출
+    response_object['dates']=[]#지출
+
+
+    for info in orderInfo:
+        response_object['dates'].append(info[0])
+        response_object['frq'].append(info[1])
+        response_object['payment'].append(info[2])
+
+
+    ######################################################### 2  #########################################################
+    sql="""
+        SELECT i.item_tag, count(*)
+        FROM `order` o, order_detail od, `user` u, item i
+        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+            and o.user_key_id = u.user_key_id
+            and o.order_id = od.order_id
+            and od.item_id=i.item_id
+            and u.store_id=%s
+        group by i.item_tag;
+        """
+    ####################################################################################################################
+    cursor.execute(sql,store_id)
+    tag_info=cursor.fetchall()
+
+    response_object['tags']=[]#tag
+    response_object['tag_count']=[]#태그 개수   
+
+    for info in tag_info:
+            
+        if info[0] is None:
+            response_object['tags'].append('기타')
+        else:
+            response_object['tags'].append(info[0])
+        response_object['tag_count'].append(info[1])
+
+
+
+
+    print(response_object)
+
+    return jsonify(response_object)
+
+
+@app.route('/api/dash_board', methods=['POST'])#대시보드
+def dash_board():
+
+    print('----dash_board------')
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    store_id=post_data.get('store_id')
+
+    ############################################## 발주 빈도 (사용자 빈도) ###############################################
+    sql="""
+        SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, u.user_id, count(*)
+        FROM `order` o, `user` u
+        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+            and o.user_key_id = u.user_key_id
+            and u.store_id=2
+        group by `day`, u.user_id
+        order by `day`;
+        """
+    #################################################################################################################
+    cursor.execute(sql,store_id)
+    orderInfo=cursor.fetchall()
+
+    response_object['dates']=[]#날짜
+    response_object['id']=[]#발주한 사람 
+    response_object['id_count']=[]#발주 수
+
+    temp_date=orderInfo[0][0]
+
+    for info in orderInfo:
+        if info[0]!=temp_date:
+            
+
+
+    print(response_object)
+    return jsonify(response_object)
+    
 
 
 if __name__ == '__main__':
