@@ -514,42 +514,99 @@ def dash_board_summary():
     return jsonify(response_object)
 
 
-@app.route('/api/dash_board', methods=['POST'])#대시보드
-def dash_board():
+@app.route('/api/dash_board_stacked', methods=['POST'])#대시보드
+def dash_board_stacked():
 
     print('----dash_board------')
     response_object = {'status':'success'}
     post_data = request.get_json()
     store_id=post_data.get('store_id')
 
+    sql="""
+        select user_id from `user` where store_id=%s;
+        """
+    cursor.execute(sql,store_id)
+    user_ids=[user[0] for user in cursor.fetchall()]
+    # print(user_ids)
+    response_object['users']=user_ids#발주한 사람 id
+
+    users=""
+    for user in user_ids:
+        users+=", SUM(IF(user_id = '" + str(user) + "', c, 0)) AS " + str(user) +" "
+        response_object[user]=[]
+
     ############################################## 발주 빈도 (사용자 빈도) ###############################################
     sql="""
-        SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, u.user_id, count(*)
-        FROM `order` o, `user` u
-        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
-            and o.user_key_id = u.user_key_id
-            and u.store_id=2
-        group by `day`, u.user_id
-        order by `day`;
+        select `day` %s
+        FROM (
+            SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, u.user_id, count(1) c
+            FROM `order` o,`user` u
+            WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+                and u.store_id=%s and o.user_key_id = u.user_key_id
+            group by `day`, u.user_id
+            order by `day`
+        ) us
+        group by `day`
+        ;
         """
     #################################################################################################################
-    cursor.execute(sql,store_id)
+    sql = sql%(users,store_id)
+    cursor.execute(sql)
     orderInfo=cursor.fetchall()
+    print('확인',orderInfo)
 
     response_object['dates']=[]#날짜
-    response_object['id']=[]#발주한 사람 
-    response_object['id_count']=[]#발주 수
+    
 
-    temp_date=orderInfo[0][0]
+
 
     for info in orderInfo:
-        if info[0]!=temp_date:
-            
+        response_object['dates'].append(info[0])
+        for i in range(len(user_ids)):
+            print(user_ids[i],info[1+i])
+            response_object[user_ids[i]].append(info[i+1])
 
 
     print(response_object)
     return jsonify(response_object)
-    
+
+
+@app.route('/api/dash_board_item', methods=['POST'])#대시보드
+def dash_board_item():
+
+    print('-------dash_board_item------')
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    store_id=post_data.get('store_id')
+
+
+
+    ##################################################################################################################
+    sql="""
+        SELECT i.item_id,i.item_name, count(*) c
+        FROM `order` o, order_detail od, `user` u, item i
+        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+            and o.user_key_id = u.user_key_id
+            and o.order_id = od.order_id
+            and od.item_id=i.item_id
+            and u.store_id=%s
+        group by i.item_id
+        order by c DESC limit 10;
+        """
+    ####################################################################################################################
+    cursor.execute(sql,store_id)
+    item_info=cursor.fetchall()
+
+    response_object['item_names']=[]
+    response_object['item_qty']=[]
+
+    for info in item_info:
+        response_object['item_names'].append(info[1])
+        response_object['item_qty'].append(info[2])
+
+
+    print(response_object)
+    return jsonify(response_object)
 
 
 if __name__ == '__main__':
@@ -559,5 +616,6 @@ if __name__ == '__main__':
             cursor = db.cursor()
             app.run()
     finally:
+        print('db close!!')
         db.close()
     

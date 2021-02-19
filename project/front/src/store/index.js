@@ -73,7 +73,7 @@ export default new Vuex.Store({
       router.push({name:'login'})
       console.log('logout')
     },
-    getUserInfo({commit}){
+    async getUserInfo({commit}){
 
       let access_token =localStorage.getItem("access_token")
       let refresh_token =localStorage.getItem("refresh_token")
@@ -85,7 +85,7 @@ export default new Vuex.Store({
       }
       console.log(config)
       const path = 'http://localhost:5000/api/user_info';
-      axios
+      await axios
         .get(path, config)
         .then(response =>{
           let userInfo = {

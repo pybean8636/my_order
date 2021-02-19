@@ -138,7 +138,7 @@
   class="mt-15 pl-10"
   max-width="90%">
     <h1 class="ml-2 mb-8">Summary</h1>
-    <div id="chart" v-if="combo_chartOptions.labels!=null">
+    <div id="chart" v-if="combo_chartOptions.labels!=null && donut_series != null">
       <v-row align="center">
         <v-col cols="7">
           <apexchart type="line" height="450" :options="combo_chartOptions" :series="combo_series"></apexchart>
@@ -150,7 +150,7 @@
     </div>
     <div id="chart" v-else>
       뭐야
-  </div>
+    </div>
   </v-card>
 
 
@@ -217,7 +217,7 @@ export default {
 
 
         //donut chart data
-        donut_series: [44, 55, 41, 17, 15],
+        donut_series: null,
 
         donut_chartOptions: {
           chart: {

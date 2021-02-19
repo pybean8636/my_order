@@ -20,13 +20,13 @@ const rejectUser=(to, from, next) =>{
 
 }
 
-const guard=(to, from, next)=>{
+const guard=async (to, from, next)=>{
   if (localStorage.getItem("refresh_token")===null){
     alert("login first!")
     next("/login")
   }
   else{
-    store.dispatch("getUserInfo")
+    await store.dispatch("getUserInfo")
     next()
   }
 }
