@@ -141,61 +141,62 @@ export default {
           
             line_series: null,//payment data
             line_chartOptions: {
-            chart: {
-                height: 350,
-                type: 'line',
-                dropShadow: {
-                enabled: true,
-                color: '#000',
-                top: 18,
-                left: 7,
-                blur: 10,
-                opacity: 0.2
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    dropShadow: {
+                    enabled: true,
+                    color: '#000',
+                    top: 18,
+                    left: 7,
+                    blur: 10,
+                    opacity: 0.2
+                    },
+                    toolbar: {
+                    show: true
+                    }
                 },
-                toolbar: {
-                show: true
-                }
-            },
-            colors: ['#2E9AFE'],
-            dataLabels: {
-                enabled: true,
-            },
-            stroke: {
-                curve: 'smooth'
-            },
-            title: {
-                text: '지출 내역',
-                align: 'left'
-            },
-            grid: {
-                borderColor: '#e7e7e7',
-                row: {
-                colors: ['transparent'], // takes an array which will be repeated on columns
-                opacity: 0.5
+                colors: ['#2E9AFE'],
+                dataLabels: {
+                    enabled: true,
                 },
-            },
-            markers: {
-                size: 1
-            },
-            xaxis: {
-                categories: null,//dates
+                stroke: {
+                    curve: 'smooth'
+                },
                 title: {
-                text: 'Date'
+                    text: '지출 내역',
+                    align: 'left'
+                },
+                grid: {
+                    borderColor: '#e7e7e7',
+                    row: {
+                    colors: ['transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                    },
+                },
+                markers: {
+                    size: 1
+                },
+                xaxis: {
+                    categories: null,//dates
+                    title: {
+                    text: 'Month Date'
+                    }
+                },
+                yaxis: {
+                    title: {
+                    text: 'Payment'
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -25,
+                    offsetX: -5
                 }
             },
-            yaxis: {
-                title: {
-                text: 'Payment'
-                }
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'right',
-                floating: true,
-                offsetY: -25,
-                offsetX: -5
-            }
-            },
+            
           
           //item rating bar chart
 
@@ -241,11 +242,6 @@ export default {
                 .then((res) => {
                     this.donut_series=res.data.tag_count
                     this.donut_chartOptions.labels=res.data.tags
-                    this.line_series=[{
-                        name:"payment",
-                        data:res.data.payment
-                    }]
-                    this.line_chartOptions.xaxis.categories=res.data.dates
                     console.log(this.line_series)
                 })
                 .catch((error) => {
@@ -292,12 +288,30 @@ export default {
                 console.error(error);
                 });
         },
+        async get_payment_year() {//payment_year
+            const payload ={
+                store_id:store.state.userInfo.store_id
+            }
+            const path = 'http://localhost:5000/api/dash_board_payment'
+            await axios.post(path, payload)
+                .then(async (res) => {
+                    this.line_series=[{
+                        name:"payment_month",
+                        data:res.data.payment_year 
+                    }]
+                    this.line_chartOptions.xaxis.categories=res.data.dates_year
+                })
+                .catch((error) => {
+                console.error(error);
+                });
+        },
 
     },
     async mounted(){
         await this.get_stacked()
         await this.getSummary()
         await this.get_item_bar()
+        await this.get_payment_year()
     }
 }
 </script>

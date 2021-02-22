@@ -465,6 +465,17 @@ def dash_board_summary():
         order by `day`;
         """
     ####################################################################################################################
+
+    # SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, count(o.order_id) `count`, 
+	# 	sum(od.detail_total_price) sum, round(avg(od.detail_total_price)) avg
+    #     FROM `order` o, order_detail od, `user` u, store s
+    #     WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW()
+    #         and o.order_id = od.order_id 
+    #         and o.user_key_id = u.user_key_id
+    #         and u.store_id=%s
+    #     group by `day`
+    #     order by `day`;
+
     cursor.execute(sql,store_id)
     orderInfo=cursor.fetchall()
 
@@ -556,9 +567,6 @@ def dash_board_stacked():
     print('확인',orderInfo)
 
     response_object['dates']=[]#날짜
-    
-
-
 
     for info in orderInfo:
         response_object['dates'].append(info[0])
@@ -604,6 +612,41 @@ def dash_board_item():
         response_object['item_names'].append(info[1])
         response_object['item_qty'].append(info[2])
 
+
+    print(response_object)
+    return jsonify(response_object)
+
+@app.route('/api/dash_board_payment', methods=['POST'])#대시보드-payment
+def dash_board_payment():
+
+    print('-------dash_board_payment------')
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    store_id=post_data.get('store_id')
+
+    ###############################################################################################################
+    sql="""
+        SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, sum(od.detail_total_price) sum
+        FROM `order` o, order_detail od, `user` u, store s
+        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 YEAR) AND NOW()
+            and o.order_id = od.order_id 
+            and o.user_key_id = u.user_key_id
+            and u.store_id=%s
+        group by `day`
+        order by `day`;
+
+        """
+    ##############################################################################################################
+    
+    response_object['payment_year']=[]
+    response_object['dates_year']=[]
+
+    cursor.execute(sql, store_id)
+    item_info=cursor.fetchall()
+
+    for info in item_info:
+        response_object['dates_year'].append(info[0])
+        response_object['payment_year'].append(info[1])
 
     print(response_object)
     return jsonify(response_object)

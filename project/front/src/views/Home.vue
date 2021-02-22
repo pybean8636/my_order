@@ -6,7 +6,6 @@
     flat
     class="mx-7 mt-10"
   >
-
     <v-list>
       <v-list-item>
         <v-list-item-icon>
@@ -153,7 +152,6 @@
     </div>
   </v-card>
 
-
 </div>
 </template>
 
@@ -181,7 +179,7 @@ export default {
           name: 'payment',
           type: 'line',
           data: null
-        }],
+        },],
 
         combo_chartOptions: {
           chart: {
@@ -196,18 +194,21 @@ export default {
           },
           dataLabels: {
             enabled: true,
-            enabledOnSeries: [1]
+            enabledOnSeries: [1,2]
           },
           labels: null,
           xaxis: {
             type: 'datetime'
           },
-          yaxis: [{
-            title: {
-              text: 'frequency',
-            },
+          yaxis: [
+            {
+              title: {
+                seriesName: 'frequency',
+                text: 'frequency',
+              },
           
           }, {
+            seriesName: 'total payment',
             opposite: true,
             title: {
               text: 'payment'
@@ -294,6 +295,7 @@ export default {
                 this.donut_series=res.data.tag_count
                 this.donut_chartOptions.labels=res.data.tags
                 // console.log(this.series)
+                console.log(this.m)
               })
               .catch((error) => {
               console.error(error);
