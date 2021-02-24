@@ -243,7 +243,7 @@ export default {
 
     },
 
-    created() {
+    mounted() {
         store.dispatch('getItems')
         // this.outOfStock()
   },

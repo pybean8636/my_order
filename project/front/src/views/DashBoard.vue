@@ -296,7 +296,7 @@ export default {
             await axios.post(path, payload)
                 .then(async (res) => {
                     this.line_series=[{
-                        name:"payment_month",
+                        name:"payment_year",
                         data:res.data.payment_year 
                     }]
                     this.line_chartOptions.xaxis.categories=res.data.dates_year

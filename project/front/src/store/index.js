@@ -50,7 +50,7 @@ export default new Vuex.Store({
   actions: {
     //tryng login  success->loginSuccess commit, fail->loginError commit
     login({dispatch}, loginOb){
-        const path = 'http://localhost:5000/api/auth/login';
+        const path = 'http://localhost:5000/api/login';
         axios
             .post(path, loginOb)
             .then((res) => {

@@ -197,7 +197,7 @@ export default {
             
 
     },
-    created(){
+    mounted(){
         this.getOrders()//주문 내역 가져오기
     },
     watch:{//order sorting
