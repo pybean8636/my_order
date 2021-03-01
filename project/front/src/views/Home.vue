@@ -6,7 +6,6 @@
     flat
     class="mx-7 mt-10"
   >
-
     <v-list>
       <v-list-item>
         <v-list-item-icon>
@@ -131,8 +130,27 @@
     </v-btn>
 
 </v-card>
-
-
+<!-- summary of dash board -->
+  
+  <v-card
+  flat
+  class="mt-15 pl-10"
+  max-width="90%">
+    <h1 class="ml-2 mb-8">Summary</h1>
+    <div id="chart" v-if="combo_chartOptions.labels!=null && donut_series != null">
+      <v-row align="center">
+        <v-col cols="7">
+          <apexchart type="line" height="450" :options="combo_chartOptions" :series="combo_series"></apexchart>
+        </v-col>
+        <v-col cols="5" align-self="center">
+            <apexchart type="donut" height="300" :options="donut_chartOptions" :series="donut_series"></apexchart>
+        </v-col>
+      </v-row>
+    </div>
+    <div id="chart" v-else>
+      뭐야
+    </div>
+  </v-card>
 
 </div>
 </template>
@@ -140,16 +158,88 @@
 <script>
 import axios from 'axios';
 import store from "../store/index.js"
+import VueApexCharts from "vue-apexcharts";
 
 export default {
   name: "home",
   components: {
+    apexchart: VueApexCharts,
   },
   data(){
     return {
       order:[],
       date:null,
-      storeInfo:null
+      storeInfo:null,
+      //combo chart data
+      combo_series: [{
+          name: 'frequency',
+          type: 'column',
+          data: null
+        }, {
+          name: 'payment',
+          type: 'line',
+          data: null
+        },],
+
+        combo_chartOptions: {
+          chart: {
+            height: 450,
+            type: 'line',
+          },
+          stroke: {
+            width: [0, 4]
+          },
+          title: {
+            text: '최근 발주 현황'
+          },
+          dataLabels: {
+            enabled: true,
+            enabledOnSeries: [1,2]
+          },
+          labels: null,
+          xaxis: {
+            type: 'datetime'
+          },
+          yaxis: [
+            {
+              title: {
+                seriesName: 'frequency',
+                text: 'frequency',
+              },
+          
+          }, {
+            seriesName: 'total payment',
+            opposite: true,
+            title: {
+              text: 'payment'
+            }
+          }]
+        },
+
+
+        //donut chart data
+        donut_series: null,
+
+        donut_chartOptions: {
+          chart: {
+            type: 'donut',
+          },
+          labels:null,
+          responsive: [{
+            breakpoint: 480,
+            options: {
+              chart: {
+                width: 200
+              },
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }]
+        }
+
+
+
     }
   },
   computed:{
@@ -191,6 +281,26 @@ export default {
               console.error(error);
               });
       },
+      async getSummary() {//summary of dash board
+          const payload ={
+              store_id:store.state.userInfo.store_id
+          }
+          const path = 'http://localhost:5000/api/dash_board_summary'
+          await axios.post(path, payload)
+              .then((res) => {
+                console.log("3 get summary info", res.data)
+                this.combo_series[0].data = res.data.frq
+                this.combo_series[1].data = res.data.payment
+                this.combo_chartOptions.labels=res.data.dates
+                this.donut_series=res.data.tag_count
+                this.donut_chartOptions.labels=res.data.tags
+                // console.log(this.series)
+                console.log(this.m)
+              })
+              .catch((error) => {
+              console.error(error);
+              });
+      },
       setItems(){//store item
         store.state.items=this.order
         this.$router.push({name: 'check'})
@@ -201,6 +311,7 @@ export default {
 
     await this.getStore()
     await this.getOrder() 
+    await this.getSummary() 
   }
 };
 </script>

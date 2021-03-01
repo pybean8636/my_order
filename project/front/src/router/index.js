@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 
 const rejectUser=(to, from, next) =>{
 
-  if(localStorage.getItem("refresh_token")){
+  if(localStorage.getItem("refresh_token") && store.state.isLogin===true){
     alert("already!")
     next("/")
   }
@@ -20,13 +20,13 @@ const rejectUser=(to, from, next) =>{
 
 }
 
-const guard=(to, from, next)=>{
+const guard=async (to, from, next)=>{
   if (localStorage.getItem("refresh_token")===null){
     alert("login first!")
     next("/login")
   }
   else{
-    store.dispatch("getUserInfo")
+    await store.dispatch("getUserInfo")
     next()
   }
 }
@@ -69,6 +69,13 @@ const routes = [
     beforeEnter: guard,
     component: () =>
     import(/* webpackChunkName: "check" */ "../views/Check.vue")
+  },
+  {
+    path: "/dash_board",
+    name: "board",
+    beforeEnter: guard,
+    component: () =>
+    import(/* webpackChunkName: "check" */ "../views/DashBoard.vue")
   },
 ];
 
