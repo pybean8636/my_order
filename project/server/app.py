@@ -125,10 +125,6 @@ def get_userInfo():
         response_object['user_key_id']=user_info[5]
         response_object['access_token']=access_token
 
-  
-
-
-
     else:
         response_object['status']="401 Error"
         response_object['message'] = 'access token error'
@@ -223,14 +219,28 @@ def get_orderInfo():
 
     
     ################아이템 아이디, 이름, 가격, 단위, 재고, 정보, 태그, 주문상세 수량, 발주 금액, 날짜###############
+
+
+# SELECT i.*, od.detail_qty, od.detail_total_price, o.`date`
+#         FROM order_detail od
+#         join (select order_id, `date` from `order` where user_key_id=%s order by `date` DESC limit 1) o 
+#         on od.order_id=o.order_id
+#         join item i 
+#         on i.item_id=od.item_id
+
+
     sql="""
-        SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
-        FROM `order` o, order_detail od, item i
-        WHERE o.user_key_id=%s and od.order_id =o.order_id
-        and od.item_id=i.item_id 
-        and o.`date` = (SELECT max(`date`) FROM `order` );
+        SELECT i.*, od.detail_qty, od.detail_total_price, (select `date` from `order`where order_id=od.order_id)
+        FROM order_detail od, item i
+        where od.order_id=(select order_id from `order` where user_key_id=%s order by `date` DESC limit 1)
+        and od.item_id=i.item_id
         """
     ################################################################################################
+    # SELECT  i.*, od.detail_qty, od.detail_total_price, o.`date`
+    #     FROM `order` o, order_detail od, item i
+    #     WHERE o.user_key_id=%s and od.order_id =o.order_id
+    #     and od.item_id=i.item_id 
+    #     and o.`date` = (SELECT max(`date`) FROM `order` where user_key_id=%s);
     cursor.execute(sql, user_key_id)
     order_info = cursor.fetchall()
 
@@ -325,7 +335,7 @@ def put_orderInfo():
 
     return jsonify(response_object)
 
-@app.route('/api/my_order_info', methods=['POST'])#마이메이지
+@app.route('/api/my_order_info', methods=['POST'])#마이페이지
 def get_myOrderInfo():
 
 
@@ -344,12 +354,18 @@ def get_myOrderInfo():
         # WHERE u.store_id=%s and o.user_key_id=u.user_key_id)  
         # order by o.order_id DESC;
 
-    #############주문상세 아이디, 수량, 금액, 주문 아이디, 아이템 아이디, 이름, 가격, 단위, 재고, 정보, 테그, 본사, 날짜 ################
+        # SELECT od.* ,i.*, o.`date`
+        # FROM order_detail od, item i, `order` o
+        # join (select user_key_id from `user` where store_id=%s) u on o.user_key_id=u.user_key_id
+        # WHERE  o.order_id=od.order_id and od.item_id= i.item_id 
+        # order by o.order_id DESC;
+
+    #############주문상세 아이디, 수량, 금액, 주문 아이디, 아이템 아이디, 이름, 가격, 단위, 재고, 정보, 태그, 본사, 날짜 ################
     sql="""
+
         SELECT od.* ,i.*, o.`date`
-        FROM order_detail od, item i, `order` o
-        join `user` u on o.user_key_id=u.user_key_id and u.store_id=%s
-        WHERE  o.order_id=od.order_id and od.item_id= i.item_id 
+        FROM `user` u, `order` o, order_detail od, item i
+        WHERE  u.store_id=%s and o.user_key_id=u.user_key_id and o.order_id=od.order_id and od.item_id= i.item_id  
         order by o.order_id DESC;
         """
     ################################################################################################################
@@ -403,16 +419,23 @@ def dash_board_summary():
 
     #############################################날짜, 발주 수, 해당 날짜 발주 총 금액##########################################
     sql="""
-        SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, count(o.order_id) `count`, sum(od.detail_total_price) sum
-        FROM `order` o, order_detail od, `user` u
-        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
-            and o.user_key_id = u.user_key_id
+        SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, count(*) `count`, sum(od.detail_total_price) sum
+        FROM `order` o, order_detail od
+        WHERE o.user_key_id in(select user_key_id from `user` where store_id=%s)
+	        and o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW()
             and o.order_id = od.order_id
-            and u.store_id=%s
         group by `day`
         order by `day`;
         """
     ####################################################################################################################
+    # SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, count(o.order_id) `count`, sum(od.detail_total_price) sum
+    #     FROM `order` o, order_detail od, `user` u
+    #     WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+    #         and o.user_key_id = u.user_key_id
+    #         and o.order_id = od.order_id
+    #         and u.store_id=%s
+    #     group by `day`
+    #     order by `day`;
 
     cursor.execute(sql,store_id)
     orderInfo=cursor.fetchall()
@@ -429,18 +452,25 @@ def dash_board_summary():
         response_object['payment'].append(info[2])
 
 
-    #################################태그, 태그 수######################################
+    #################################태그, 태그 수######################################..................
     sql="""
         SELECT i.item_tag, count(*)
         FROM `order` o, order_detail od, `user` u, item i
-        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
-            and o.user_key_id = u.user_key_id
+        WHERE o.user_key_id in(select user_key_id from `user` where store_id=%s)
+            and o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
             and o.order_id = od.order_id
             and od.item_id=i.item_id
-            and u.store_id=%s
         group by i.item_tag;
         """
     #################################################################################
+    # SELECT i.item_tag, count(*)
+    #     FROM `order` o, order_detail od, `user` u, item i
+    #     WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+    #         and o.user_key_id = u.user_key_id
+    #         and o.order_id = od.order_id
+    #         and od.item_id=i.item_id
+    #         and u.store_id=%s
+    #     group by i.item_tag;
     cursor.execute(sql,store_id)
     tag_info=cursor.fetchall()
 
@@ -470,17 +500,31 @@ def dash_board_stacked():
 
     ##############해당 매점을 관리하는 사용자 id##############......................
     sql="""
-        select user_id from `user` where store_id=%s;
+        select user_key_id, user_id from `user` where store_id=%s;
         """
     ###################################################
     cursor.execute(sql,store_id)
-    user_ids=[user[0] for user in cursor.fetchall()]
-    response_object['users']=user_ids#발주한 사람 id
+    # user_ids=cursor.fetchall()#[user[0] for user in cursor.fetchall()]
+    # response_object['users']=[info[1] for info in user_ids]#user_ids#발주한 사람 id
+    # users_key=[info[0] for info in user_ids]
 
+    # users=""
+    # for user in users_key:
+    #     users+=", SUM(IF(user_id = '" + str(user) + "', c, 0)) AS " + str(user) +" "
+    #     response_object[user]=[]
     users=""
-    for user in user_ids:
-        users+=", SUM(IF(user_id = '" + str(user) + "', c, 0)) AS " + str(user) +" "
-        response_object[user]=[]
+    user_key_ids=[]
+    # ids=[]
+    response_object['users']=[]
+    user_info=cursor.fetchall()
+    for user_key, user_id in user_info:
+        users+=", SUM(IF(user_key_id = " + str(user_key) + ", c, 0)) AS " + str(user_id) +" "
+        # ids.append(user_id)
+        response_object['users'].append(user_id)
+        response_object[user_id]=[]
+        user_key_ids.append(str(user_key))
+    user_key_ids=",".join(user_key_ids)
+
 
     ################################ 날짜, 사용자별 발주 수 #################################
     # sql="""
@@ -508,20 +552,35 @@ def dash_board_stacked():
     #     DEALLOCATE PREPARE stmt;
     #     """
     ###################################################################################
+    # sql="""
+    #     select `day` %s
+    #     FROM (
+    #         SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, u.user_id, count(1) c
+    #         FROM `order` o,`user` u
+    #         WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+    #             and u.store_id=%s and o.user_key_id = u.user_key_id
+    #         group by `day`, u.user_id
+    #     ) us
+    #     group by `day`
+    #     order by `day`
+    #     ;
+    # """
+    #user_key_id 미리 넣기
     sql="""
         select `day` %s
         FROM (
-            SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, u.user_id, count(1) c
-            FROM `order` o,`user` u
-            WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
-                and u.store_id=%s and o.user_key_id = u.user_key_id
-            group by `day`, u.user_id
+            SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, o.user_key_id, count(*) c
+            FROM `order` o
+            WHERE o.user_key_id in(%s)
+                and o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
+            group by `day`, o.user_key_id
         ) us
         group by `day`
         order by `day`
         ;
     """
-    sql = sql%(users,store_id)
+    sql = sql%(users,user_key_ids)
+    print(sql)
     cursor.execute(sql)
     orderInfo=cursor.fetchall()
 
@@ -529,9 +588,9 @@ def dash_board_stacked():
 
     for info in orderInfo:
         response_object['dates'].append(info[0])
-        for i in range(len(user_ids)):
-            print(user_ids[i],info[1+i])
-            response_object[user_ids[i]].append(info[i+1])
+        for i in range(len(user_info)):
+            # print(user_ids[i],info[1+i])
+            response_object[response_object['users'][i]].append(info[i+1])
 
 
     print(response_object)
@@ -548,7 +607,7 @@ def dash_board_item():
 
 
 
-    ############################아이템 아이디, 이름, 발주된 수#################################
+    ############################아이템 아이디, 이름, 발주된 수#################################......
     sql="""
         SELECT i.item_id,i.item_name, count(*) c
         FROM `order` o, order_detail od, `user` u, item i
@@ -586,14 +645,12 @@ def dash_board_payment():
     #######################################날짜, 발주 금액 총합###########################################
     sql="""
         SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, sum(od.detail_total_price) sum
-        FROM `order` o, order_detail od, `user` u, store s
-        WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 YEAR) AND NOW()
-            and o.order_id = od.order_id 
-            and o.user_key_id = u.user_key_id
-            and u.store_id=%s
+        FROM `order` o, order_detail od
+        WHERE o.user_key_id in(select user_key_id from `user` where store_id=%s)
+	        and o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 YEAR) AND NOW()
+            and o.order_id = od.order_id
         group by `day`
         order by `day`;
-
         """
     ###############################################################################################
     
@@ -612,7 +669,7 @@ def dash_board_payment():
 
 
 if __name__ == '__main__':
-    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB', charset='utf8')
+    db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB2', charset='utf8')
     try:
         with db.cursor() as curs:
             cursor = db.cursor()

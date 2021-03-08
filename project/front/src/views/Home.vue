@@ -185,6 +185,11 @@ export default {
           chart: {
             height: 450,
             type: 'line',
+            zoom: {
+              type: "x",
+              enabled: true,
+              autoScaleYaxis: true
+            },
           },
           stroke: {
             width: [0, 4]

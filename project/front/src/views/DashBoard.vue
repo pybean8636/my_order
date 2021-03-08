@@ -145,16 +145,21 @@ export default {
                     height: 350,
                     type: 'line',
                     dropShadow: {
-                    enabled: true,
-                    color: '#000',
-                    top: 18,
-                    left: 7,
-                    blur: 10,
-                    opacity: 0.2
+                        enabled: true,
+                        color: '#000',
+                        top: 18,
+                        left: 7,
+                        blur: 10,
+                        opacity: 0.2
                     },
                     toolbar: {
-                    show: true
-                    }
+                        show: true
+                    },          
+                    zoom: {
+                        type: "x",
+                        enabled: true,
+                        autoScaleYaxis: true
+                    },
                 },
                 colors: ['#2E9AFE'],
                 dataLabels: {
