@@ -13,7 +13,7 @@
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
-            <h3>{{storeInfo.headquarters_name}}</h3>
+            <h3>{{storeInfo.headquarters_name+' '}}</h3> <h2>{{storeInfo.store_name+'점'}}</h2>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -24,7 +24,7 @@
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
-            <h2>{{storeInfo.store_location}}점</h2>
+            <h3>{{storeInfo.store_location}}</h3>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>

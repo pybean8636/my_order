@@ -93,6 +93,7 @@ export default new Vuex.Store({
             name:response.data.user_name,
             contact:response.data.user_contact,
             store_id:response.data.store_id,
+            store_name:response.data.store_name,
             store_location:response.data.store_location,
             user_key_id:response.data.user_key_id
           }

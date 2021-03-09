@@ -5,7 +5,7 @@
         class="rounded-t-xl pa-10 indigo lighten-5"
         flat
         > 
-        <h1 class="text-center font-weight-thin mt-5">{{ userInfo.store_location }}점 발주</h1>
+        <h1 class="text-center font-weight-thin mt-5">{{ userInfo.store_name }}점 발주</h1>
         
     <!-- 스위치 -->
       <v-switch

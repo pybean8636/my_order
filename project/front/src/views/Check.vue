@@ -1,6 +1,6 @@
 <template>
     <v-container class="ma-10">
-        <h2 class="mb-4 font-weight-thin">{{ userInfo.store_location }}점 발주</h2>
+        <h2 class="mb-4 font-weight-thin">{{ userInfo.store_name }}점 발주</h2>
 
         <v-divider class="mb-8"></v-divider>
         <!-- 아이템 나열 -->
@@ -57,7 +57,7 @@
         </v-card>
         <v-col align-self="start" cols="11 text-right" class="my-3">
             <h2>total price</h2>
-            <h3 class="mb-6">{{total}}원</h3>
+            <h3 class="mb-6">{{total()}}원</h3>
             
             <v-btn
             color="grey darken-4"
@@ -90,12 +90,16 @@ export default {
   data(){
       return {
           selectedItems:[],
-          checked:[]
+          checked:[],
+          total_price:0
       }
     },
     computed:{
        
         ...mapState(["userInfo", 'items', 'tags']),
+        
+    },
+    methods:{
         total(){ //총가격저장
             var items=this.items
             var sum=0
@@ -104,17 +108,19 @@ export default {
                     sum+=(item.price*item.qty)
                 }
              });
+            this.total_price=sum
             return sum          
         },
-    },
-    methods:{
         async newOrder() {
             
             const payload ={
               items:this.selectedItems.filter((item)=>{
                        return this.checked.includes(item.id)
                     }),
-              user_key_id:store.state.userInfo.user_key_id
+              user_key_id:store.state.userInfo.user_key_id,
+              store_id:store.state.userInfo.store_id,
+              total_price:this.total_price
+              //summary
             }
 
             console.log('payload',payload)
