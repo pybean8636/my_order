@@ -332,7 +332,7 @@ def get_MyPage():
         where o.store_id=%s
         order by o.`date` desc
         ;
-    """
+        """
     cursor.execute(sql,store_id)
     orderInfo=cursor.fetchall()
 
@@ -348,8 +348,6 @@ def get_MyPage():
         }
         response_object['order_info'].append(temp)
 
-
-    #response_object['order_info']=orderInfo#주문 리스트
     print(response_object['order_info'])
     return jsonify(response_object)
 
@@ -365,13 +363,13 @@ def get_detail():
         select o.`date`, 
             (select user_id from `user` where user_key_id=o.user_key_id) id,
             od.detail_qty, od.detail_total_price,
-            i.item_name, i.item_price, i.item_stock, i.item_info, i.item_tag
+            i.item_name, i.item_price, i.item_stock, i.item_info, i.item_tag, i.item_unit, i.item_id
         from `order` o, order_detail od, item i
         where o.order_id=%s
             and o.order_id=od.order_id
             and od.item_id=i.item_id
         ;
-    """
+        """
 
     cursor.execute(sql,order_id)
     detailInfo=cursor.fetchall()
@@ -388,7 +386,10 @@ def get_detail():
             'price':info[5],
             'stock':info[6],
             'info':info[7],
-            'tag':info[8]
+            'tag':info[8],
+            'unit':info[9],
+            'id':info[10],
+            'check':True
         }
         if temp['tag']==None:
             temp['tag']='기타'
@@ -398,61 +399,6 @@ def get_detail():
     
 
     return jsonify(response_object)
-
-
-# @app.route('/api/my_order_info', methods=['POST'])#마이페이지->분할
-# def get_myOrderInfo():
-
-
-#     print('----my page------')
-#     response_object = {'status':'success'}
-#     post_data = request.get_json()
-#     store_id=post_data.get('store_id')
-
-#     #############주문상세 아이디, 수량, 금액, 주문 아이디, 아이템 아이디, 이름, 가격, 단위, 재고, 정보, 태그, 본사, 날짜 ################
-#     sql="""
-#         SELECT od.* ,i.*, o.`date`
-#         FROM `user` u, `order` o, order_detail od, item i
-#         WHERE  u.store_id=%s and o.user_key_id=u.user_key_id and o.order_id=od.order_id and od.item_id= i.item_id  
-#         order by o.order_id DESC;
-#         """
-#     ################################################################################################################
-#     cursor.execute(sql,store_id)
-#     orderInfo=cursor.fetchall()
-
-
-#     response_object['order_info']=[]
-#     order_id=orderInfo[0][3]
-#     temp={'order':[],'date':orderInfo[0][13], 'sum':0}#주문별로 물품 리스트, 날짜, 금액 총합
-    
-#     for info in orderInfo:
-#         if order_id != info[3]:
-#             print('append')
-#             response_object['order_info'].append(temp)
-#             order_id=info[3]
-#             temp={'order':[],'date':info[13], 'sum':0}
-        
-#         temp2={
-#             'name':info[6],
-#             'qty':info[1],
-#             'unit':info[8],
-#             'price':info[7],
-#             'total_price':info[2],
-#             'id':info[4],
-#             'stock':info[9],
-#             'info':info[10],
-#             'tag':info[11],
-#             'check':True
-#         }
-#         temp['sum']+=info[2]
-#         if info[11]==None:
-#             temp2['tag']='기타'
-#         temp['order'].append(temp2)
-            
-#     response_object['order_info'].append(temp)
-
-#     print(response_object)
-#     return jsonify(response_object)
 
 
 @app.route('/api/dash_board_summary', methods=['POST'])#메인 홈 요약 대시보드

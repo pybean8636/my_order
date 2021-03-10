@@ -1,143 +1,87 @@
 <template>
-<div class="mx-5">
-    <!-- 매장명 -->
-    <v-card
-        flat
-        class="rounded-b-xl indigo lighten-5 mx-10 "
-        height="170px"
-        max-width="84%"
-        >
-        <v-row align="center">
-            <v-col cols="12" align="center" class="pt-16">
-                <h1 class="font-weight-thin">{{ userInfo.store_name}}점 발주 내역</h1>
-            </v-col>
-        </v-row>
-        </v-card>
-
-    <div class="mx-10 mb-8">
-
-        <!-- 정렬 선택 메뉴 -->
-        <v-col class="text-right" cols="11">
-            <v-menu
-            offset-y
-            >
-            <template v-slot:activator="{ attrs, on }">
-                <v-btn
-                :color="'grey darken-4'"
-                class="white--text mt-8 mx-8"
-                v-bind="attrs"
-                v-on="on"
-                >
-                sort options
-                </v-btn>
-            </template>
-
-            <v-list>
-                <v-list-item
-                v-for="list in lists"
-                :key="list"
-                @click="sortBy=list"
-                class="text-center"
-                >
-                <v-list-item-title v-text="list"></v-list-item-title>
-                </v-list-item>
-            </v-list>
-            </v-menu>
-        </v-col>
-
-        <!-- 주문 내역 -->
-        <v-card
+<!-- my page -->
+    <div class="mx-5">
+        <div id="title">
+            <v-card
             flat
-            max-width="85%"
-            class="mt-8 pb-2 mx-8 rounded-t-xl" 
+            class="rounded-b-xl indigo lighten-5 mx-10 "
+            height="170px"
+            max-width="84%"
+            >
+                <v-row align="center">
+                    <v-col cols="12" align="center" class="pt-16">
+                        <h1 class="font-weight-thin">{{ userInfo.store_name}}점 발주 내역</h1>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </div>
+        <div id="sort-button">
+            <v-col class="text-right" cols="11">
+                <v-menu
+                offset-y
+                >
+                    <template v-slot:activator="{ attrs, on }">
+                        <v-btn
+                        :color="'grey darken-4'"
+                        class="white--text mt-8 mx-8"
+                        v-bind="attrs"
+                        v-on="on"
+                        >
+                        sort options
+                        </v-btn>
+                    </template>
+
+                    <v-list>
+                        <v-list-item
+                        v-for="list in lists"
+                        :key="list"
+                        @click="sortBy=list"
+                        class="text-center"
+                        >
+                        <v-list-item-title v-text="list"></v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-col>
+        </div>
+        <div id="order-list" class="mx-8">
+            <v-card 
             v-for="(order, index) in orders"
             :key="index"
-            outlined
-            
-        >
-            <v-toolbar
-            :color="'indigo darken-4'"
-            dark
-            fixed
-            height="50px"
-            class="rounded-t-xl"
+            class="indigo lighten-5 ma-8"
+            height="80px"
+            max-width="85%"
             >
-
-                <v-toolbar-title class="mx-4">
-                    {{order.date.slice(0, 22)}}
-                </v-toolbar-title>
-
-                <v-spacer></v-spacer>
-
-            </v-toolbar>
-            <v-card 
-            flat
-            max-height="200px"
-            class="overflow-y-auto px-3"
-            >
-            <v-simple-table width="200px"
-            >
-
-           <thead>
-                <tr>
-                    <th class="text-left">
-                    Name
-                    </th>
-                    <th class="text-left">
-                    Qty
-                    </th>
-                    <th class="text-left">
-                    Unit
-                    </th>
-                    <th class="text-left">
-                    Price
-                    </th>
-                    <th class="text-left">
-                    Total Price
-                    </th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr v-for="item in order.order" :key=item.name class="body-2">
-                    <td width="20%">{{item.name}}</td>
-                    <td width="20%">{{item.qty}}</td>
-                    <td width="20%">{{item.unit}}</td>
-                    <td width="20%">{{item.price}}원</td>
-                    <td width="20%">{{item.total_price}}원</td>
-                </tr>
-                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td><h4 class="text-left subtitle-2">합계</h4></td>
-                    <td>
-                    <h4 class="text-left subtitle-2">{{order.sum}}원</h4>
-                    </td>
-                </tr>
-            </tbody>
-
-            </v-simple-table>
+                <!-- {{order}} -->
+                <v-row >
+                    <v-col align-self="center" cols="4">
+                        {{order.date}}
+                    </v-col>
+                    <v-col align-self="center">
+                        {{order.summary}}
+                    </v-col>
+                    <v-col align-self="center">
+                        {{order.total_price}}원
+                    </v-col>
+                    <v-col align-self="center">
+                        주문자 {{order.user_id}}
+                    </v-col>
+                    <v-col>
+                        <v-btn
+                        outlined
+                        text
+                        dark
+                        class="indigo darken-3"
+                        @click="setItems(order.order_id)"
+                        >
+                            자세히
+                        </v-btn>
+                    </v-col>
+                    
+                </v-row>
             </v-card>
-            <!-- 똑같이 발주 버튼 -->
-            <v-btn
-            large
-            dark
-            absolute
-            bottom
-            right
-            class="rounded-xl grey darken-4 mb-1 mr-2"
-            @click="setItems(index)"
-            >
-                <v-icon>mdi-cart-arrow-down</v-icon>
-            </v-btn>
-
-        </v-card>
-
-
+        </div>
     </div>
-        
-</div>
 </template>
 
 <script>
@@ -146,59 +90,66 @@ import store from "../store/index.js"
 import {mapState} from "vuex"
 
 export default {
-     data(){
-        return {
-            orders:[],//주문 내역
+    name: "my_page",
+    data(){
+        return{
+            orders:[],
             lists:['최신순', '금액순'],//정렬 기준 list
-            sortBy:'최신순'//정렬 기준 default:최신순   
-            
+            sortBy:'최신순',//정렬 기준 default:최신순 
         }
     },
     computed:{
-        
-        ...mapState(["userInfo"])//사용자 정보
+        ...mapState(["userInfo"])
     },
     methods:{
-        getOrders(){//그동안 사용자의 매장 발주 내역 가져오기
+        getOrders(){//매장 발주 내역 가져오기
             const payload ={
                 store_id:store.state.userInfo.store_id
             }
-            const path = 'http://localhost:5000/api/my_order_info'
-             axios.post(path, payload)
-              .then((res) => {
-                console.log("get my page info")
+            const path = 'http://localhost:5000/api/my_page'
+            axios.post(path, payload)
+            .then((res) => {
                 this.orders = res.data.order_info
-              })
-              .catch((error) => {
-              console.error(error);
-              });
+            })
+            .catch((error) => {
+            console.error(error);
+            });
         },
-        setItems(index){//store item에 똑같이 주문할 아이템 정보 저장
-            console.log('index',index)
-            store.state.items=this.orders[index].order
-            this.$router.push({name: 'check'})
+        async getDetails(order_id){
+            const payload={
+                order_id: order_id
+            }
+            const path = 'http://localhost:5000/api/order_detail'
+            await axios.post(path, payload)
+            .then((res) => {
+                 store.state.items = res.data.detail_info
+            })
+            .catch((error) => {
+            console.error(error);
+            });
         },
-
+        async setItems(order_id){//store item에 똑같이 주문할 아이템 정보 저장
+            await this.getDetails(order_id)
+            this.$router.push({name: 'detail'})
+        },
         customSort(i, j){//sorting custom
             if (this.sortBy==='최신순'){
                 if(i.date===j.date){
                     return 0
                 }
-                return i.date< j.date? 1:-1
+                return i.date < j.date? 1:-1
             }
             else{
-                if(i.sum===j.sum){
+                if(i.total_price===j.total_price){
                     return 0
                 }
-                return i.sum< j.sum? 1:-1
+                return i.total_price< j.total_price? 1:-1
             }
             
         }
-            
-
     },
     mounted(){
-        this.getOrders()//주문 내역 가져오기
+        this.getOrders()
     },
     watch:{//order sorting
         sortBy(newV, oldV){
@@ -207,5 +158,5 @@ export default {
             }
         }
     }
-};
+}
 </script>

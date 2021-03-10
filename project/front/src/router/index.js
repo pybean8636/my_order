@@ -77,6 +77,13 @@ const routes = [
     component: () =>
     import(/* webpackChunkName: "check" */ "../views/DashBoard.vue")
   },
+  {
+    path: "/detail",
+    name: "detail",
+    beforeEnter: guard,
+    component: () =>
+    import(/* webpackChunkName: "check" */ "../views/OrderDetail.vue")
+  },
 ];
 
 const router = new VueRouter({
