@@ -1,8 +1,8 @@
 <template>
-    <div class="ma-10">
+    <div class="ma-10 pa-4">
         <div id="title" class="ml-5">
-            <h2 class="mb-4 font-weight-thin">{{ userInfo.store_name }}점 발주</h2>
-            <v-divider class="my-8" max-width="93%"></v-divider>
+            <h2 class="mb-4 font-weight-thin">{{ userInfo.store_name }}점 발주 상세</h2>
+            <v-divider class="my-8" max-width="90%"></v-divider>
         </div>
         <div id="item-list" class="mt-10">
             <v-toolbar
@@ -12,10 +12,10 @@
             max-width="93%"
             flat
             >
-                <v-col cols="6" class="pl-10">
+                <v-col cols="6" class="pl-10 pb-8">
                     <h3>발주 날짜 {{items[0].date}}</h3>
                 </v-col>
-                <v-col class="text-right" cols="5">
+                <v-col class="text-right pb-8" cols="5">
                     <h3>주문자 {{items[0].user_id}}</h3>
                 </v-col> 
             </v-toolbar>

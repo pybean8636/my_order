@@ -235,7 +235,7 @@ def get_orderInfo():
     print(order_info)
 
     response_object['order_info']=[]
-    response_object['date']=order_info[0][-1]
+    response_object['date']=order_info[0][-1].strftime('%Y-%m-%d %H:%M:%S')
     
     for info in order_info:
         
@@ -341,7 +341,7 @@ def get_MyPage():
     for info in orderInfo:
         temp={
             'order_id':info[0],
-            'date':info[1],
+            'date':info[1].strftime('%Y-%m-%d %H:%M:%S'),
             'user_id':info[2],
             'total_price':info[3],
             'summary':info[4]
@@ -378,7 +378,7 @@ def get_detail():
 
     for info in detailInfo:
         temp={
-            'date':info[0],
+            'date':info[0].strftime('%Y-%m-%d %H:%M:%S'),
             'user_id':info[1],
             'qty':info[2],
             'total_price':info[3],

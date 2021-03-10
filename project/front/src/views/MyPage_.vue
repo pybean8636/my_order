@@ -9,7 +9,7 @@
         >
         <v-row align="center">
             <v-col cols="12" align="center" class="pt-16">
-                <h1 class="font-weight-thin">{{ .store_name}}점 발주 내역</h1>
+                <h1 class="font-weight-thin">{{ userInfo.store_name}}점 발주 내역</h1>
             </v-col>
         </v-row>
     </v-card>

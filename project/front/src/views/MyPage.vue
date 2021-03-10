@@ -48,37 +48,39 @@
             <v-card 
             v-for="(order, index) in orders"
             :key="index"
-            class="indigo lighten-5 ma-8"
+            class="indigo lighten-5 ma-6"
             height="80px"
             max-width="85%"
+            flat
             >
                 <!-- {{order}} -->
-                <v-row >
-                    <v-col align-self="center" cols="4">
-                        {{order.date}}
-                    </v-col>
-                    <v-col align-self="center">
-                        {{order.summary}}
-                    </v-col>
-                    <v-col align-self="center">
-                        {{order.total_price}}원
-                    </v-col>
-                    <v-col align-self="center">
-                        주문자 {{order.user_id}}
-                    </v-col>
-                    <v-col>
-                        <v-btn
-                        outlined
-                        text
-                        dark
-                        class="indigo darken-3"
-                        @click="setItems(order.order_id)"
-                        >
-                            자세히
-                        </v-btn>
-                    </v-col>
-                    
-                </v-row>
+                <v-container fluid>
+                    <v-row justify="center" align="center" class="pt-2">
+                        <v-col align-self="center" cols="3" class="text-center">
+                            발주 날짜: {{order.date}}
+                        </v-col>
+                        <v-col align-self="center" cols="3" class="text-center">
+                            {{order.summary}}
+                        </v-col>
+                        <v-col align-self="center" cols="2" class="text-center">
+                            {{order.total_price}}원
+                        </v-col>
+                        <v-col align-self="center" cols="2" class="text-center">
+                            주문자 {{order.user_id}}
+                        </v-col>
+                        <v-col cols="2" class="text-center">
+                            <v-btn
+                            outlined
+                            text
+                            dark
+                            class="indigo darken-3 text-center"
+                            @click="setItems(order.order_id)"
+                            >
+                                자세히
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
             </v-card>
         </div>
     </div>
