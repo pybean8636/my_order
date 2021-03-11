@@ -48,7 +48,8 @@
             <v-card 
             v-for="(order, index) in paginatedData"
             :key="index"
-            class="indigo lighten-5 ma-6"
+            class="ma-6"
+            color="#eeeef6"
             height="80px"
             max-width="85%"
             flat
@@ -68,7 +69,7 @@
                         <v-col align-self="center" cols="2" class="text-center">
                             주문자 {{order.user_id}}
                         </v-col>
-                        <v-col cols="2" class="text-center">
+                        <v-col cols="1" class="text-center pr-2">
                             <v-btn
                             outlined
                             text

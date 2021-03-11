@@ -107,11 +107,11 @@ def get_userInfo():
         user_key_id=payload['user_key_id']
         store_id=payload['store_id']
       
-        ####################사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 , user key#########################
+        ####################사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 , 매장 이름#########################
         sql="""
             SELECT u.user_id, u.user_name, u.user_contact, s.store_id, s.store_location, s.store_name
             FROM `user` u, store s
-            WHERE u.user_key_id=%s and s.store_id = u.store_id;
+            WHERE u.user_key_id=%s and u.store_id = s.store_id;
             """
         ################################################################################################
         cursor.execute(sql, user_key_id)
@@ -151,7 +151,7 @@ def get_storeInfo():
             from headquarters
             where headquarters_id=s.headquarters_id) headquarters_name
         FROM store s
-        WHERE s.store_id=%s ;
+        WHERE s.store_id=%s;
         """
     ########################################################################
     cursor.execute(sql, store_id)
@@ -326,6 +326,7 @@ def get_MyPage():
 
     store_id=post_data.get('store_id')
 
+    ######################################주문 아이디, 날짜, 주문자 아이디, 총 금액, 요약################################################
     sql="""
         SELECT o.order_id, o.`date`, (select user_id from `user` where user_key_id=o.user_key_id) id, o.total_price, o.summary
         FROM `order` o
@@ -333,6 +334,7 @@ def get_MyPage():
         order by o.`date` desc
         ;
         """
+    ############################################################################################################################
     cursor.execute(sql,store_id)
     orderInfo=cursor.fetchall()
 
@@ -359,6 +361,7 @@ def get_detail():
     post_data= request.get_json()
     order_id=post_data.get('order_id')
 
+    ####################주문 날짜, 주문자 아이디, 수량, 금액, 아이템 이를, 가격, 재고, 정보, 태그, 단위, 아이디##################
     sql="""
         select o.`date`, 
             (select user_id from `user` where user_key_id=o.user_key_id) id,
@@ -370,7 +373,7 @@ def get_detail():
             and od.item_id=i.item_id
         ;
         """
-
+    ############################################################################################################
     cursor.execute(sql,order_id)
     detailInfo=cursor.fetchall()
 
@@ -443,7 +446,7 @@ def dash_board_summary():
         response_object['payment'].append(info[2])
 
 
-    #################################태그, 태그 수######################################..................
+    #################################태그, 태그 수######################################
     sql="""
         SELECT i.item_tag, count(*)
         FROM `order` o, order_detail od, `user` u, item i
@@ -488,11 +491,11 @@ def dash_board_stacked():
     post_data = request.get_json()
     store_id=post_data.get('store_id')
 
-    ##############해당 매점을 관리하는 사용자 id##############......................
+    ######################해당 매점을 관리하는 사용자 id######################
     sql="""
         select user_key_id, user_id from `user` where store_id=%s;
         """
-    ###################################################
+    ###################################################################
     cursor.execute(sql,store_id)
     
     users=""
@@ -524,6 +527,7 @@ def dash_board_stacked():
         order by `day`
         ;
     """
+    #####################################################################################
     sql = sql%(users,user_key_ids)
     print(sql)
     cursor.execute(sql)
@@ -552,7 +556,7 @@ def dash_board_item():
 
 
 
-    ############################아이템 아이디, 이름, 발주된 수#################################......
+    ######################################아이템 아이디, 이름, 발주된 수################################################
     sql="""
         SELECT od.item_id,(select item_name from item where item_id=od.item_id) item_name, sum(od.detail_qty) c
         FROM `order` o, order_detail od
@@ -562,7 +566,7 @@ def dash_board_item():
         group by od.item_id
         order by c DESC limit 7;
         """
-    #####################################################################################
+    ##############################################################################################################
     # SELECT i.item_id,i.item_name, count(*) c
     #     FROM `order` o, order_detail od, `user` u, item i
     #     WHERE o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
@@ -594,7 +598,7 @@ def dash_board_payment():
     post_data = request.get_json()
     store_id=post_data.get('store_id')
 
-    #######################################날짜, 발주 금액 총합###########################################
+    #######################################날짜, 발주 금액 총합#########################################
     sql="""
         SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`,  sum(o.total_price) sum
         FROM `order` o

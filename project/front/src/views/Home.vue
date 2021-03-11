@@ -8,12 +8,13 @@
   >
     <v-list>
       <v-list-item>
-        <v-list-item-icon>
+        <v-list-item-icon class="pt-3">
           <v-icon large color="indigo darken-4">{{ 'mdi-storefront-outline' }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
-            <h3>{{storeInfo.headquarters_name+' '}}</h3> <h2>{{storeInfo.store_name+'점'}}</h2>
+            <div class="subtitle-1 font-weight-bold">{{storeInfo.headquarters_name+' '}}</div>
+            <div class="title font-weight-black">{{storeInfo.store_name+'점'}}</div>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -24,7 +25,7 @@
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
-            <h3>{{storeInfo.store_location}}</h3>
+            <div class="subtitle-1">{{storeInfo.store_location}}</div>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -35,7 +36,7 @@
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
-            {{storeInfo.store_contact}}
+            <div class="subtitle-1">{{storeInfo.store_contact}}</div>
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
@@ -60,7 +61,7 @@
     class="rounded-t-xl"
     >
       <v-toolbar-title>
-        <h4> My Latest Order</h4>
+        <h4 class="pl-5"> My Latest Order</h4>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -70,24 +71,24 @@
 
   <v-card class="overflow-y-auto" max-height="400px" 
     elevation="0" outlined>
-    <p class="ma-4 body-2">Date: {{this.date.slice(0, 22)}}</p>
+    <p class="ma-5 pl-3 body-2">Date: {{this.date.slice(0, 22)}}</p>
   <v-simple-table width="200px" class="ma-5">
 
     <thead>
       <tr>
-        <th class="text-left">
+        <th class="text-left subtitle-1 font-weight-black">
           Name
         </th>
-        <th class="text-left">
+        <th class="text-left subtitle-1 font-weight-black">
           Qty
         </th>
-        <th class="text-left">
+        <th class="text-left subtitle-1 font-weight-black">
           Unit
         </th>
-        <th class="text-left">
+        <th class="text-left subtitle-1 font-weight-black">
           Price
         </th>
-        <th class="text-left">
+        <th class="text-left subtitle-1 font-weight-black">
           Total Price
         </th>
       </tr>
@@ -122,7 +123,7 @@
       absolute
       bottom
       right
-      class="rounded-xl indigo darken-4 mb-1 mr-2"
+      class="rounded-xl indigo lighten-1 mb-1 mr-2"
       @click="setItems"
       
     >
@@ -179,52 +180,59 @@ export default {
           name: 'payment',
           type: 'line',
           data: null
-        },],
-
-        combo_chartOptions: {
-          chart: {
-            height: 450,
-            type: 'line',
-            zoom: {
-              type: "x",
-              enabled: true,
-              autoScaleYaxis: true
-            },
-          },
-          stroke: {
-            width: [0, 4]
-          },
-          title: {
-            text: '최근 발주 현황'
-          },
-          dataLabels: {
-            enabled: true,
-            enabledOnSeries: [1,2]
-          },
-          labels: null,
-          xaxis: {
-            type: 'datetime'
-          },
-          yaxis: [
-            {
-              labels: {
-                formatter: function(val) {
-                  return val.toFixed(0);
-                }
-              },
-              title: {
-                seriesName: 'frequency',
-                text: 'frequency',
-              },
-            }, 
-            {
-            opposite: true,
-            title: {
-              seriesName: 'total payment',
-              text: 'payment'
-            }
-          }]
         },
+      ],
+      // plotOptions:{
+      //   bar:{
+      //       radius: 30,
+      //       barHeight:'90%',
+      //       endingShape: 'rounded'
+      //   },
+      // },
+      combo_chartOptions: {
+        chart: {
+          height: 450,
+          type: 'line',
+          zoom: {
+            type: "x",
+            enabled: true,
+            autoScaleYaxis: true
+          },
+        },
+        stroke: {
+          width: [0, 4]
+        },
+        title: {
+          text: '최근 발주 현황'
+        },
+        dataLabels: {
+          enabled: true,
+          enabledOnSeries: [1,2]
+        },
+        labels: null,
+        xaxis: {
+          type: 'datetime'
+        },
+        yaxis: [
+          {
+            labels: {
+              formatter: function(val) {
+                return val.toFixed(0);
+              }
+            },
+            title: {
+              seriesName: 'frequency',
+              text: 'frequency',
+            },
+          }, 
+          {
+          opposite: true,
+          title: {
+            seriesName: 'total payment',
+            text: 'payment'
+          }
+        }]
+      },
 
 
         //donut chart data
@@ -234,12 +242,15 @@ export default {
           chart: {
             type: 'donut',
           },
+          title: {
+              text: '태그 비율'
+          },
           labels:null,
           responsive: [{
-            breakpoint: 480,
+            breakpoint: 450,
             options: {
               chart: {
-                width: 200
+                height: 450
               },
               legend: {
                 position: 'bottom'
