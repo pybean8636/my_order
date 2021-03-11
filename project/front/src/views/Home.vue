@@ -207,15 +207,20 @@ export default {
           },
           yaxis: [
             {
+              labels: {
+                formatter: function(val) {
+                  return val.toFixed(0);
+                }
+              },
               title: {
                 seriesName: 'frequency',
                 text: 'frequency',
               },
-          
-          }, {
-            seriesName: 'total payment',
+            }, 
+            {
             opposite: true,
             title: {
+              seriesName: 'total payment',
               text: 'payment'
             }
           }]

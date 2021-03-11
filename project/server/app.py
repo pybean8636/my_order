@@ -517,7 +517,7 @@ def dash_board_stacked():
             SELECT date_format(o.`date`,'%%Y-%%m-%%d') `day`, o.user_key_id, count(*) c
             FROM `order` o
             WHERE o.user_key_id in(%s)
-                and o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 YEAR) AND NOW() 
+                and o.`date` BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND NOW() 
             group by `day`, o.user_key_id
         ) us
         group by `day`

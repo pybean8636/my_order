@@ -16,7 +16,7 @@
             </v-card>
         </div>
         <div id="sort-button">
-            <v-col class="text-right" cols="11">
+            <v-col class="text-right pr-13" cols="11">
                 <v-menu
                 offset-y
                 >
@@ -46,7 +46,7 @@
         </div>
         <div id="order-list" class="mx-8">
             <v-card 
-            v-for="(order, index) in orders"
+            v-for="(order, index) in paginatedData"
             :key="index"
             class="indigo lighten-5 ma-6"
             height="80px"
@@ -56,8 +56,8 @@
                 <!-- {{order}} -->
                 <v-container fluid>
                     <v-row justify="center" align="center" class="pt-2">
-                        <v-col align-self="center" cols="3" class="text-center">
-                            발주 날짜: {{order.date}}
+                        <v-col align-self="center" cols="3" class="text-center pl-4">
+                            발주날짜: {{order.date}}
                         </v-col>
                         <v-col align-self="center" cols="3" class="text-center">
                             {{order.summary}}
@@ -82,7 +82,19 @@
                     </v-row>
                 </v-container>
             </v-card>
+            <div id="pagination">
+                <div class="text-center my-5">
+                    <v-col cols="11">
+                        <v-pagination
+                        v-model="pageNum"
+                        :length="pageCount"
+                        ></v-pagination>
+                    </v-col>
+                    
+                </div>
+            </div>
         </div>
+        
     </div>
 </template>
 
@@ -97,11 +109,27 @@ export default {
         return{
             orders:[],
             lists:['최신순', '금액순'],//정렬 기준 list
-            sortBy:'최신순',//정렬 기준 default:최신순 
+            sortBy:'최신순',//정렬 기준 default:최신순
+            
+            pageNum :1,//현재 페이지
+            pageSize:6,//한 페이지에 나올 발주 정보 사이즈
         }
     },
     computed:{
-        ...mapState(["userInfo"])
+        ...mapState(["userInfo"]),
+        pageCount(){//페이지 개수
+            let order_length=this.orders.length,
+            listSize= this.pageSize,
+            page=Math.floor((order_length-1)/listSize)+1;
+
+            return page;
+        },
+        paginatedData(){//페이지 별로 슬라이스
+            const start = (this.pageNum -1) * this.pageSize,
+            end= start + this.pageSize;
+
+            return this.orders.slice(start, end);
+        }
     },
     methods:{
         getOrders(){//매장 발주 내역 가져오기
@@ -148,15 +176,22 @@ export default {
                 return i.total_price< j.total_price? 1:-1
             }
             
-        }
+        },
+        // nextPage(){
+        //     this.pageNum+=1;
+        // },
+        // prevPage(){
+        //     this.pageNum-=1;
+        // }
     },
     mounted(){
         this.getOrders()
     },
     watch:{//order sorting
-        sortBy(newV, oldV){
+        async sortBy(newV, oldV){
             if (oldV!=newV){
-                this.orders.sort(this.customSort)
+                await this.orders.sort(this.customSort)
+                this.pageNum=1
             }
         }
     }

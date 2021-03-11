@@ -94,47 +94,54 @@ export default {
             //사용자별 발주 빈도 stacked chart data
             stacked_series: [],//사용자별 발주 수
             stacked_chartOptions: {
-            chart: {
-                type: 'bar',
-                height: 350,
-                stacked: true,
-                toolbar: {
-                show: true
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                    toolbar: {
+                    show: true
+                    },
+                    zoom: {
+                    enabled: true
+                    }
                 },
-                zoom: {
-                enabled: true
-                }
-            },
-            title: {
-                text: '발주 빈도 그래프'
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
+                title: {
+                    text: '발주 빈도 그래프'
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                    legend: {
+                        position: 'bottom',
+                        offsetX: -10,
+                        offsetY: 0
+                    }
+                    }
+                }],
+                plotOptions: {
+                    bar: {
+                    borderRadius: 8,
+                    horizontal: false,
+                    },
+                },
+                xaxis: {
+                    type: 'datetime',
+                    categories: null,//발주 날짜
+                },
+                yaxis:{
+                    labels: {
+                        formatter: function(val) {//정수만
+                            return val.toFixed(0);
+                        }
+                    }
+                },
                 legend: {
-                    position: 'bottom',
-                    offsetX: -10,
-                    offsetY: 0
-                }
-                }
-            }],
-            plotOptions: {
-                bar: {
-                borderRadius: 8,
-                horizontal: false,
+                    position: 'right',
+                    offsetY: 40
                 },
-            },
-            xaxis: {
-                type: 'datetime',
-                categories: null,//발주 날짜
-            },
-            legend: {
-                position: 'right',
-                offsetY: 40
-            },
-            fill: {
-                opacity: 1
-            }
+                fill: {
+                    opacity: 1
+                }
             },
 
             //payment line chart
