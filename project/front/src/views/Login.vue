@@ -68,7 +68,7 @@ export default {
         }
     },
     computed:{
-        ...mapState(['isLogin', 'isLoginError'])
+        ...mapState(['isLogin', 'isLoginError','userInfo'])
     },
     methods:{
         ...mapActions(['login']),
@@ -76,7 +76,13 @@ export default {
     watch:{
         isLogin(newV, oldV){
             if (oldV!=true && newV===true){
-                this.$router.push({name: 'home'})
+                if (this.userInfo.user_type=='ST'){
+                    this.$router.push({name: 'home'})
+                }
+                else{
+                    this.$router.push({name: 'sv_home'})
+                }
+                
             }
         }
     }

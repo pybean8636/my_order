@@ -23,7 +23,7 @@ def login_auth():
     user_id=post_data['id']
     user_pw=post_data['pw']#client가 보낸 아이디, 패스워드
 
-    sql="SELECT user_key_id, store_id, user_pw FROM user WHERE user_id=%s"#유저 검색
+    sql="SELECT user_key_id, store_id, user_pw, user_type FROM user WHERE user_id=%s"#유저 검색
     rows_count = cursor.execute(sql, user_id)
 
     if rows_count > 0:
@@ -34,11 +34,13 @@ def login_auth():
             response_object['message'] = 'login success'
             store_id=user_info[1]
             user_key_id=user_info[0]
+            user_type=user_info[3]
 
             payload = {#access payload
                 'user_key_id':user_key_id,
                 'user_id':user_id,
                 'store_id':store_id,
+                'user_type':user_type,#user_type 추가
                 'exp':datetime.now()+timedelta(hours=2)
             }
             print('access token', payload)
@@ -51,6 +53,7 @@ def login_auth():
                 'user_key_id':user_key_id,
                 'user_id':user_id,
                 'store_id':store_id,
+                'user_type':user_type,#user_type 추가
                 'exp':datetime.now()+timedelta(weeks=2)
             }
             refresh_token = jwt.encode(payload,'myorderrefreshtoken', 'HS256')
@@ -93,6 +96,7 @@ def get_userInfo():
                     'user_key_id':payload['user_key_id'],
                     'user_id':payload['user_id'],
                     'store_id':payload['store_id'],
+                    'user_type':payload['user_type'],#user_type 추가
                     'exp':datetime.now()+timedelta(seconds=60)
                 }
                 access_token = jwt.encode(new_payload,'myorderaccesstoken', 'HS256')
@@ -106,23 +110,45 @@ def get_userInfo():
         
         user_key_id=payload['user_key_id']
         store_id=payload['store_id']
-      
-        ####################사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 , 매장 이름#########################
-        sql="""
-            SELECT u.user_id, u.user_name, u.user_contact, s.store_id, s.store_location, s.store_name
-            FROM `user` u, store s
-            WHERE u.user_key_id=%s and u.store_id = s.store_id;
-            """
-        ################################################################################################
-        cursor.execute(sql, user_key_id)
-        user_info = cursor.fetchone()
+        user_type=payload['user_type']
 
-        response_object['user_id']=user_info[0]
-        response_object['user_name']=user_info[1]
-        response_object['user_contact']=user_info[2]
-        response_object['store_id']=user_info[3]
-        response_object['store_location']=user_info[4]
-        response_object['store_name']=user_info[5]
+        ##sv st 분리
+
+        if user_type =="SV":#sv
+
+            sql="""
+                SELECT u.user_id, u.user_name, u.user_contact
+                FROM `user` u
+                WHERE u.user_key_id=%s   
+            """
+            cursor.execute(sql, user_key_id)
+            sv_user_info = cursor.fetchone()
+
+            response_object['user_id']=sv_user_info[0]
+            response_object['user_name']=sv_user_info[1]
+            response_object['user_contact']=sv_user_info[2]
+            
+        
+        else:#st
+
+            ####################사용자의 아이디, 이름, 번호, 매장 아이디, 매장 위치 , 매장 이름#########################
+            sql="""
+                SELECT u.user_id, u.user_name, u.user_contact, s.store_id, s.store_location, s.store_name
+                FROM `user` u, store s
+                WHERE u.user_key_id=%s and u.store_id = s.store_id;
+                """
+            ################################################################################################
+            cursor.execute(sql, user_key_id)
+            user_info = cursor.fetchone()
+
+            response_object['user_id']=user_info[0]
+            response_object['user_name']=user_info[1]
+            response_object['user_contact']=user_info[2]
+            response_object['store_id']=user_info[3]
+            response_object['store_location']=user_info[4]
+            response_object['store_name']=user_info[5]
+        
+        response_object['user_type']=user_type
         response_object['user_key_id']=user_key_id
         response_object['access_token']=access_token
 
@@ -629,6 +655,123 @@ def dash_board_payment():
 
     print(response_object)
     return jsonify(response_object)
+
+#################본사####################
+
+@app.route('/api/headquarters_info', methods=['POST'])#sv 홈 - 본사 정보 반환
+def get_headInfo():
+    print("--------headquarters_info--------")
+
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    user_key_id=post_data.get('user_key_id')
+
+    #################################본사 정보#################################
+    sql="""
+        SELECT h.*
+        FROM headquarters h
+        WHERE h.headquarters_id=
+            (select headquarters_id 
+            from supervise 
+            where user_user_key_id=%s 
+            limit 1)
+        ;
+        """
+    ########################################################################
+    cursor.execute(sql, user_key_id)
+    head_info = cursor.fetchone()
+
+    response_object['headquarters_info']={
+        'headquarters_id':head_info[0],#본사 아이디
+        'headquarters_name':head_info[1], #본사 이름
+        'headquarters_contact':head_info[2],  #연락처
+        'headquarters_location':head_info[3] #주소
+        } 
+    print('headquarters_info\n',response_object)
+    return jsonify(response_object)
+
+@app.route('/api/sv_store_info', methods=['POST'])#sv 홈 - 담당 가맹점 리스트
+def get_svStoreInfo():
+    print("--------sv_store_info--------")
+
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    user_key_id=post_data.get('user_key_id')
+
+    #################################본사 정보#################################
+    sql="""
+        SELECT s.store_id, s.store_name, s.store_location, s.store_contact, 
+            (select `date` 
+            from `order` 
+            where store_id=s.store_id 
+            order by `date` desc 
+            limit 1) `date`
+        FROM store s
+        WHERE s.store_id in 
+            (select store_store_id 
+            from supervise 
+            where user_user_key_id=%s)
+        ;
+        """
+    ########################################################################
+    cursor.execute(sql, user_key_id)
+    sv_store_info = cursor.fetchall()
+
+    response_object['sv_store_info']=[]
+
+    for store_info in sv_store_info:
+        temp={
+            'store_id':store_info[0],#가맹점 아이디
+            'store_name':store_info[1],#가맹점 이름
+            'store_location':store_info[2], #주소
+            'store_contact':store_info[3], #연락처
+            'latest_date':store_info[4].strftime('%Y-%m-%d %H:%M:%S') #가장 최근 발주 날짜
+        } 
+        response_object['sv_store_info'].append(temp)
+
+    print('sv_store_info\n',response_object)
+    return jsonify(response_object)
+
+@app.route('/api/item_list', methods=['POST'])#sv item-item list
+def get_ItemList():
+    print("--------item_list--------")
+
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    user_key_id=post_data.get('user_key_id')
+
+    #################################본사 정보#################################
+    sql="""
+        SELECT i.item_id, i.item_name, i.item_price, i.item_stock, i.item_unit, i.item_info, i.item_tag
+        FROM item i
+        WHERE i.headquarters_id=
+            (select headquarters_id 
+            from supervise 
+            where user_user_key_id=%s 
+            limit 1)
+        ;
+        """
+    ########################################################################
+    cursor.execute(sql, user_key_id)
+    item_list_info = cursor.fetchall()
+
+    response_object['item_list_info']=[]
+
+    for item_info in item_list_info:
+        temp={
+        'item_id':item_info[0],
+        'item_name':item_info[1],
+        'item_price':item_info[2], 
+        'item_stock':item_info[3],
+        'item_unit':item_info[4],
+        'item_info':item_info[5],
+        'item_tag':item_info[6]
+        } 
+        response_object['item_list_info'].append(temp)
+
+    print('item_list_info\n',response_object)
+    return jsonify(response_object)
+
 
 
 if __name__ == '__main__':

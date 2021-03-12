@@ -88,14 +88,27 @@ export default new Vuex.Store({
       await axios
         .get(path, config)
         .then(response =>{
-          let userInfo = {
-            id:response.data.user_id,
-            name:response.data.user_name,
-            contact:response.data.user_contact,
-            store_id:response.data.store_id,
-            store_name:response.data.store_name,
-            store_location:response.data.store_location,
-            user_key_id:response.data.user_key_id
+          let userInfo ={}
+          if(response.data.user_type=='SV'){
+            userInfo = {
+              id:response.data.user_id,
+              name:response.data.user_name,
+              contact:response.data.user_contact,
+              user_key_id:response.data.user_key_id,
+              user_type:response.data.user_type
+            }
+          }
+          else{
+            userInfo = {
+              id:response.data.user_id,
+              name:response.data.user_name,
+              contact:response.data.user_contact,
+              store_id:response.data.store_id,
+              store_name:response.data.store_name,
+              store_location:response.data.store_location,
+              user_key_id:response.data.user_key_id,
+              user_type:response.data.user_type
+            }
           }
           localStorage.setItem("access_token", response.data.access_token)
           commit("loginSucceess", userInfo)

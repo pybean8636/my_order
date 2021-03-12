@@ -21,21 +21,41 @@
           <h3>로그인을 해주세요</h3>
         </v-list-item-content>
 
-        <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          link
-          class="mt-2"
-        >
-          <v-list-item-icon class="ml-4">
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+        <div 
+        v-if="userInfo!=null && userInfo.user_type==='ST'">
+          <v-list-item
+            v-for="item in items"
+            :key="item.title"
+            link
+            class="mt-2"
+          >
+            <v-list-item-icon class="ml-4">
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
 
-          <v-list-item-content>
-            <v-list-item-title @click="$router.push({name: item.name}).catch(err => {})" ><h4>{{ item.title }}</h4></v-list-item-title>
-            <!-- 똑같은 주소로 이동하는 거에 에러뜨는 거 신경 안 쓸라면 .catch(err => {}) 추가 -->
-          </v-list-item-content>
-        </v-list-item>
+            <v-list-item-content>
+              <v-list-item-title @click="$router.push({name: item.name}).catch(err => {})" ><h4>{{ item.title }}</h4></v-list-item-title>
+              <!-- 똑같은 주소로 이동하는 거에 에러뜨는 거 신경 안 쓸라면 .catch(err => {}) 추가 -->
+            </v-list-item-content>
+          </v-list-item>
+        </div>
+
+        <div v-else-if="userInfo!=null && userInfo.user_type==='SV'">
+          <v-list-item
+            v-for="item in items_sv"
+            :key="item.title"
+            link
+            class="mt-2"
+          >
+            <v-list-item-icon class="ml-4">
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title @click="$router.push({name: item.name}).catch(err => {})" ><h4>{{ item.title }}</h4></v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </div>
       </v-list>
 
       <template v-slot:append>
@@ -83,6 +103,7 @@
 
 <script>
 import {mapState} from "vuex"
+// import store from "./store/index.js"
 
 export default {
   name: "App",
@@ -97,10 +118,16 @@ export default {
           { title: 'Order', icon: 'mdi-cart', name: 'order' },
           { title: 'Dash Board', icon: 'mdi-chart-bar', name: 'board' },
         ],
+        items_sv: [
+          { title: 'Home', icon: 'mdi-home', name: 'sv_home' },
+          { title: 'Item', icon: 'mdi-cart', name: 'item'},
+          { title: 'Dash Board', icon: 'mdi-chart-bar', name: 'sv_board' },
+        ],
+        user_type:null
   }),
   computed:{
     ...mapState(['isLogin','userInfo'])
-  }
+  },
 };
 </script>
 

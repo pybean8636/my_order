@@ -84,6 +84,27 @@ const routes = [
     component: () =>
     import(/* webpackChunkName: "check" */ "../views/OrderDetail.vue")
   },
+  {
+    path: "/sv_home",
+    name: "sv_home",
+    beforeEnter: guard,
+    component: () =>
+    import(/* webpackChunkName: "check" */ "../views/svHome.vue")
+  },
+  {
+    path: "/sv_dash_board",
+    name: "sv_board",
+    beforeEnter: guard,
+    component: () =>
+    import(/* webpackChunkName: "check" */ "../views/svDashBoard.vue")
+  },
+  {
+    path: "/item",
+    name: "item",
+    beforeEnter: guard,
+    component: () =>
+    import(/* webpackChunkName: "check" */ "../views/Item.vue")
+  },
 ];
 
 const router = new VueRouter({
