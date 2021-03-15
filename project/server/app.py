@@ -773,6 +773,58 @@ def get_ItemList():
     return jsonify(response_object)
 
 
+@app.route('/api/sv_board_region', methods=['POST'])#sv board-region
+def get_regionData():
+    print("--------sv_board_region--------")
+
+    response_object = {'status':'success'}
+    post_data = request.get_json()
+    user_key_id=post_data.get('user_key_id')
+
+    #################################지역, 가맹점 이름, 발주 빈도#################################
+    sql="""
+        SELECT SUBSTRING_INDEX(s.store_location,' ',1) region, s.store_name, count(*)
+        FROM store s, `order` o
+        WHERE s.store_id in 
+            (select store_store_id 
+            from supervise 
+            where user_user_key_id=%s)
+            and s.store_id=o.store_id
+        group by s.store_id
+        ;
+        """
+    ########################################################################
+    cursor.execute(sql, user_key_id)
+    region_data = cursor.fetchall()#지역들 저장
+
+    response_object['region_data']={}
+
+    for data in region_data:
+        if data[0] not in response_object['region_data'].keys():
+            response_object['region_data'][data[0]]={
+                'region_count': data[2],
+                'stores':[
+                    {
+                        'store_name':data[1],
+                        'count':data[2]
+                    }
+                ]
+            }
+        else:
+            response_object['region_data'][data[0]]['region_count']+=data[2]
+            temp={
+                'store_name':data[1],
+                'count':data[2]
+            }
+            response_object['region_data'][data[0]]['stores'].append(temp)
+
+    response_object['regions']=list(response_object['region_data'].keys())
+
+    print('region_data\n',response_object)
+    return jsonify(response_object)
+
+
+
 
 if __name__ == '__main__':
     db = pymysql.connect(host='localhost', port=3306, user='root', passwd='dhltlrdls', db='prjDB2', charset='utf8')
